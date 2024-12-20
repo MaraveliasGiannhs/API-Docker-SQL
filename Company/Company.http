@@ -1,0 +1,60 @@
+@Company_HostAddress = https://localhost:7071
+@id=0b4552ee-51db-45b1-8db6-b05e5a93c8bf
+
+GET {{Company_HostAddress}}/
+Accept: application/json
+
+###
+
+
+GET {{Company_HostAddress}}/{{id}}
+Content-Type: application/json
+
+
+###
+
+
+
+POST {{Company_HostAddress}}/
+Content-Type: application/json
+
+{
+  "name" : "CompanyName2",
+  "createdAt" : "2024-12-13",
+  "updatedAt" : "2025-12-13"
+}
+
+###
+
+
+PUT {{Company_HostAddress}}/{{id}}
+Content-Type: application/json
+
+{
+  "name" : "edited",
+  "createdAt" : "2024-12-13",
+  "updatedAt" : "2025-12-13"
+}
+
+###
+ 
+
+ 
+ 
+
+DELETE {{Company_HostAddress}}/{{id}}
+Content-Type: application/json
+
+###
+POST {{Company_HostAddress}}/
+Content-Type: application/json
+
+{
+  //CompanyModelDTO
+}
+
+###
+
+GET {{Company_HostAddress}}/
+
+###
