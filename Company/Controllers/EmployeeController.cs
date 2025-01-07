@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Company.Controllers
 {
     [ApiController]
-    [Route("api/employees")] //?
+    [Route("api/employee")] //?
     public class EmployeeController : ControllerBase
     {
 
@@ -24,7 +24,7 @@ namespace Company.Controllers
 
 
 
-        [HttpPost("/employee")] 
+        [HttpPost] 
         public async Task<IResult> CreateEmployee(EmployeeModelDTO employeeDTO)
         {
 
@@ -58,7 +58,7 @@ namespace Company.Controllers
 
 
 
-        [HttpGet("/employee/{id}")]
+        [HttpGet("{id}")]
         public async Task<IResult> ReadEmployee(Guid id)
         {
             EmployeeModel? employee;
@@ -81,7 +81,7 @@ namespace Company.Controllers
 
 
 
-        [HttpGet("/employee")]
+        [HttpGet]
         public async Task<IResult> ReadAllEmployees(MyDbContext _db)
         {
             var employeeDTO = await _db.Employee.Select(employee => new EmployeeModelDTO()
@@ -103,17 +103,17 @@ namespace Company.Controllers
 
 
 
-        [HttpPut("/employee/{id}")]
+        [HttpPut("{id}")]
         public async Task<IResult> UpdateEmployee(Guid id, EmployeeModelDTO employeeDTO)
         {
             var employee = await _db.Employee.FindAsync(id);
 
             if (employee == null)
                 return TypedResults.NotFound(employee);
-
-
+            
+            //fields taken from frontend
             employee.Name = employeeDTO.Name;
-            employee.StartedWorkAt = employeeDTO.StartedWorkAt;
+            //employee.StartedWorkAt = employeeDTO.StartedWorkAt;
             employee.FinishedWorkAt = employeeDTO.FinishedWorkAt;
             //Also change WorkingPos here
 
@@ -136,7 +136,7 @@ namespace Company.Controllers
 
 
 
-        [HttpDelete("/employee/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IResult> DeleteEmployee(Guid id)
         {
             var employee = await _db.Employee.FindAsync(id);

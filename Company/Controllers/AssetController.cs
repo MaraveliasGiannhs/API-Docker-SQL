@@ -24,7 +24,7 @@ namespace Company.Controllers
 
 
 
-        [HttpPost("/asset")] //?
+        [HttpPost] //?
         public async Task<IResult> CreateAsset(AssetModelDTO assetDTO)
         {
 
@@ -57,7 +57,7 @@ namespace Company.Controllers
 
 
 
-        [HttpGet("/asset/{id}")]
+        [HttpGet("{id}")]
         public async Task<IResult> ReadAsset(Guid id)
         {
             AssetModel? asset;
@@ -80,7 +80,7 @@ namespace Company.Controllers
 
 
 
-        [HttpGet("/asset")]
+        [HttpGet]
         public async Task<IResult> ReadAllAsset(MyDbContext _db)
         {
             var assetDTO = await _db.Asset.Select(asset => new AssetModelDTO()
@@ -102,7 +102,7 @@ namespace Company.Controllers
 
 
 
-        [HttpPut("/asset/{id}")]
+        [HttpPut("{id}")]
         public async Task<IResult> UpdateAsset(Guid id, AssetModelDTO assetDTO)
         {
             var asset = await _db.Asset.FindAsync(id);
@@ -110,10 +110,10 @@ namespace Company.Controllers
             if (asset == null)
                 return TypedResults.NotFound(asset);
 
-
+            
             asset.Name = assetDTO.Name;
-            asset.CreatedAt = assetDTO.CreatedAt;
-            asset.UpdatedAt = assetDTO.UpdatedAt;
+            //asset.CreatedAt = assetDTO.CreatedAt;
+            asset.UpdatedAt = DateTime.UtcNow;
             asset.AssetTypeId = assetDTO.AssetTypeId;
 
             var newAssetDTO = new AssetModelDTO()
@@ -134,7 +134,7 @@ namespace Company.Controllers
 
 
 
-        [HttpDelete("/asset/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IResult> DeleteAsset(Guid id)
         {
             var asset = await _db.Asset.FindAsync(id);

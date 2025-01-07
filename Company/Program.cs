@@ -17,12 +17,13 @@ builder.Services.AddMvcCore();
 
 builder.Services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
 {
-    builder.WithOrigins("http://localhost:4200/")
+    builder.WithOrigins("http://localhost:4200")
            .AllowAnyMethod()
-           .AllowAnyHeader();
+           .AllowAnyHeader()
+           .AllowAnyOrigin();
 }));
 
-
+ 
 
 
 
@@ -34,6 +35,9 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+
+app.UseCors("MyPolicy");
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -41,13 +45,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
+ 
+ 
 app.UseAuthorization();
+app.UseRouting();
 
 app.MapControllers();
-app.UseCors("MyPolicy");
-
+ 
 
 
 app.Run();

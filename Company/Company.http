@@ -1,4 +1,4 @@
-@Company_HostAddress = https://localhost:7071
+@Company_HostAddress = http://localhost:5178
 @id=0b4552ee-51db-45b1-8db6-b05e5a93c8bf
 
 GET {{Company_HostAddress}}/
@@ -39,22 +39,15 @@ Content-Type: application/json
 ###
  
 
- 
- 
-
 DELETE {{Company_HostAddress}}/{{id}}
 Content-Type: application/json
 
 ###
-POST {{Company_HostAddress}}/
+
+
+
+
+GET {{Company_HostAddress}}/assetType
 Content-Type: application/json
-
-{
-  //CompanyModelDTO
-}
-
-###
-
-GET {{Company_HostAddress}}/
 
 ###

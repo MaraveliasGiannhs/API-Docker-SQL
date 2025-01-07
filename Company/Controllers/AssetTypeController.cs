@@ -1,7 +1,8 @@
-﻿using System.Data.Entity;
-using Company.Data;
+﻿using Company.Data;
 using Company.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace Company.Controllers
 {
@@ -22,7 +23,7 @@ namespace Company.Controllers
 
 
 
-        [HttpPost("/assetType")] //?
+        [HttpPost] //?
         public async Task<IResult> CreateAsset(AssetTypeDTO assetTypeDTO)
         {
 
@@ -37,7 +38,7 @@ namespace Company.Controllers
 
             await _db.SaveChangesAsync();
 
-            var newAssetType = new AssetModelDTO()
+            var newAssetType = new AssetTypeDTO()
             {
                 Id = assetType.Id,
                 Name = assetType.Name
@@ -50,7 +51,7 @@ namespace Company.Controllers
 
 
 
-        [HttpGet("/assetType/{id}")]
+        [HttpGet("{id}")]
         public async Task<IResult> ReadAsset(Guid id)
         {
             AssetTypeModel? assetType;
@@ -59,7 +60,7 @@ namespace Company.Controllers
             if (assetType == null)
                 return TypedResults.NotFound(assetType);
 
-            var assetTypeDTO = new AssetModelDTO()
+            var assetTypeDTO = new AssetTypeDTO()
             {
                 Id = assetType.Id,
                 Name = assetType.Name,
@@ -70,10 +71,10 @@ namespace Company.Controllers
 
 
 
-        [HttpGet("/assetType")]
+        [HttpGet]
         public async Task<IResult> ReadAllAsset(MyDbContext _db)
         {
-            var assetTypeDTO = await _db.AssetType.Select(assetType => new AssetModelDTO()
+            var assetTypeDTO = await _db.AssetType.Select(assetType => new AssetTypeDTO()
             {
 
                 Id = assetType.Id, //?
@@ -90,7 +91,7 @@ namespace Company.Controllers
 
 
 
-        [HttpPut("/assetType/{id}")]
+        [HttpPut("{id}")]
         public async Task<IResult> UpdateAsset(Guid id, AssetTypeDTO assetTypeDTO)
         {
             var assetType = await _db.AssetType.FindAsync(id);
@@ -102,7 +103,7 @@ namespace Company.Controllers
             assetType.Name = assetTypeDTO.Name;
        
 
-            var newAssetTypeDTO = new AssetModelDTO()
+            var newAssetTypeDTO = new AssetTypeDTO()
             {
                 Id = assetType.Id,
                 Name = assetType.Name,
@@ -118,7 +119,7 @@ namespace Company.Controllers
 
 
 
-        [HttpDelete("/assetType/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IResult> DeleteAsset(Guid id)
         {
             var assetType = await _db.AssetType.FindAsync(id);
