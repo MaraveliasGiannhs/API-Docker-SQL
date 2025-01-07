@@ -24,7 +24,7 @@ namespace Company.Controllers
 
 
 
-        [HttpPost("/branch")] //?
+        [HttpPost] //?
         public async Task<IResult> CreateBranch(BranchModelDTO branchDTO)
         {
 
@@ -58,7 +58,7 @@ namespace Company.Controllers
 
 
 
-        [HttpGet("/branch/{id}")]
+        [HttpGet("{id}")]
         public async Task<IResult> ReadBranch(Guid id)
         {
             BranchModel? branch;
@@ -82,7 +82,7 @@ namespace Company.Controllers
 
 
 
-        [HttpGet("/branch")]
+        [HttpGet]
         public async Task<IResult> ReadAllBranches(MyDbContext _db)
         {
             var branchDTO = await _db.Branch.Select(branch => new BranchModelDTO()
@@ -105,7 +105,7 @@ namespace Company.Controllers
 
 
 
-        [HttpPut("/branch/{id}")]
+        [HttpPut("{id}")]
         public async Task<IResult> UpdateBranch(Guid id, BranchModelDTO branchDTO)
         {
             var branch = await _db.Branch.FindAsync(id);
@@ -136,7 +136,7 @@ namespace Company.Controllers
 
 
 
-        [HttpDelete("/branch/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IResult> DeleteBranch(Guid id)
         {
             var branch = await _db.Branch.FindAsync(id);

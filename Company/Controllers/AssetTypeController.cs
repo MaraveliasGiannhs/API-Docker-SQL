@@ -67,8 +67,28 @@ namespace Company.Controllers
               };
             return TypedResults.Ok(assetTypeDTO);
         }
+        
+        ////////////////////SEARCH////////////////////
+        [HttpGet("/search")]
+        public async Task<IResult> SearchTerm(AssetTypeLookup term)
+        {
+            if (term == null)
+                return TypedResults.BadRequest("Search term cannot be empty.");
+
+            IQueryable<AssetTypeModel> assetTypeDb = _db.AssetType; //?
 
 
+            //FILTERS
+            if (!string.IsNullOrWhiteSpace(term.Like))
+                assetTypeDb = assetTypeDb.Where(a => a.Name.Contains(term.Like.ToLower()));
+            
+            if (term.Id.HasValue)
+                assetTypeDb = assetTypeDb.Where(a => a.Id == term.Id.Value);
+
+             var searchTerm = await assetTypeDb.ToListAsync(); 
+
+            return TypedResults.Ok(searchTerm);
+        }
 
 
         [HttpGet]
