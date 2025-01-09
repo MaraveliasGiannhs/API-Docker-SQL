@@ -27,12 +27,11 @@ namespace Company.Controllers
 
 
         [HttpPost]
-        [HttpPost("{id}")]
-        public async Task<IResult> CreateAsset(Guid id ,AssetTypeDTO assetTypeDTO)
+        public async Task<IResult> CreateAsset(AssetTypeDTO assetTypeDTO)
         {
-            Trace.WriteLine(id);
+            //Trace.WriteLine(assetTypeDTO.Id);
 
-            if (id == Guid.Empty) //create
+            if (!assetTypeDTO.Id.HasValue) //create
             {
  
                 var assetType = new AssetTypeModel()
@@ -56,7 +55,7 @@ namespace Company.Controllers
             else //update
             {
 
-                var assetType = await _db.AssetType.FindAsync(id);
+                var assetType = await _db.AssetType.FindAsync(assetTypeDTO.Id);
 
                 if (assetType == null)
                     return TypedResults.NotFound(assetType);

@@ -1,0 +1,9 @@
+﻿namespace Company.Lookup
+{
+    public class AssetLookup
+    {
+        public Guid? Id { get; set; }
+        public string Like { get; set; }
+
+    }
+}

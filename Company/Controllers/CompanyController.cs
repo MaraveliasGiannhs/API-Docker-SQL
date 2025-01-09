@@ -20,7 +20,7 @@ namespace Company.Controllers
             _db = db;
         }
 
-        [HttpPost("/company")]
+        [HttpPost]
         public async Task<IResult> Create(CompanyModelDTO companyDTO)
         {
 
@@ -52,7 +52,7 @@ namespace Company.Controllers
 
 
 
-        [HttpGet("/company/{id}")]
+        [HttpGet("{id}")]
         public async Task<IResult> Read(Guid id)
         {
             CompanyModel? company;            
@@ -74,7 +74,7 @@ namespace Company.Controllers
 
 
 
-        [HttpGet("/company")]
+        [HttpGet]
         public async Task<IResult> ReadAll(MyDbContext _db)
         {
             var companyDTO = await _db.Company.Select(company => new CompanyModelDTO()
@@ -94,7 +94,7 @@ namespace Company.Controllers
 
 
 
-        [HttpPut("/company/{id}")]
+        [HttpPut("{id}")]
         public async Task<IResult> Update(Guid id, CompanyModelDTO companyDTO )
         {
             var company = await _db.Company.FindAsync(id);
@@ -104,8 +104,8 @@ namespace Company.Controllers
 
 
             company.Name = companyDTO.Name;
-            company.UpdatedAt = companyDTO.UpdatedAt;
-            company.CreatedAt = companyDTO.CreatedAt;
+            company.UpdatedAt = DateTime.UtcNow;
+            //company.CreatedAt = companyDTO.CreatedAt;
 
             CompanyModelDTO newCompanyDTO = new()
             {
@@ -125,7 +125,7 @@ namespace Company.Controllers
 
 
 
-        [HttpDelete("/company/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IResult> Delete(Guid id)
         {
             var company = await _db.Company.FindAsync(id);
