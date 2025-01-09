@@ -3,7 +3,7 @@ using Company.Data;
 using Company.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Company.Lookup
+using Company.Lookup;
 
 
 namespace Company.Controllers
