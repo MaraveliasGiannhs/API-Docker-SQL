@@ -4,6 +4,7 @@ using Company.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Company.Controllers
 {
@@ -28,33 +29,33 @@ namespace Company.Controllers
         [HttpPost]
         public async Task<IResult> CreateAsset(AssetModelDTO assetDTO)
         {
-            if (!assetDTO.Id.HasValue)
+            if (!assetDTO.Id.HasValue) //post
             {
-                var asset = new AssetModel()
+                var asset = new AssetModel()  //add data to model
                 {
                     Id = Guid.NewGuid(),
                     Name = assetDTO.Name,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow,
-                    AssetTypeId = assetDTO.AssetTypeId,
+                    AssetTypeId = (Guid)assetDTO.AssetType.Id,
                 };
 
-                await _db.Asset.AddAsync(asset);
+                await _db.Asset.AddAsync(asset); //add to db
 
-                await _db.SaveChangesAsync();
+                await _db.SaveChangesAsync();  //save db
 
-                var newAssetDTO = new AssetModelDTO()
+                var newAssetDTO = new AssetModelDTO()  //add to dto to send back ?
                 {
                     Id = asset.Id,
                     Name = asset.Name,
                     CreatedAt = asset.CreatedAt,
                     UpdatedAt = asset.UpdatedAt,
-                    AssetTypeId = assetDTO.AssetTypeId,
+                    AssetType = assetDTO.AssetType, //?
                 };
 
                 return TypedResults.Ok(newAssetDTO);
             }
-            else
+            else //put
             {
                 var asset = await _db.Asset.FindAsync(assetDTO.Id);
 
@@ -65,7 +66,7 @@ namespace Company.Controllers
                 asset.Name = assetDTO.Name;
                 //asset.CreatedAt = assetDTO.CreatedAt;
                 asset.UpdatedAt = DateTime.UtcNow;
-                asset.AssetTypeId = assetDTO.AssetTypeId;
+                asset.AssetTypeId = (Guid)assetDTO.AssetType.Id;
 
                 var newAssetDTO = new AssetModelDTO()
                 {
@@ -73,7 +74,7 @@ namespace Company.Controllers
                     Name = asset.Name,
                     CreatedAt = asset.CreatedAt,
                     UpdatedAt = asset.UpdatedAt,
-                    AssetTypeId = asset.AssetTypeId,
+                    AssetType = assetDTO.AssetType
                 };
 
                 await _db.SaveChangesAsync();
@@ -89,11 +90,15 @@ namespace Company.Controllers
         [HttpGet("{id}")]
         public async Task<IResult> ReadAsset(Guid id)
         {
+ 
             AssetModel? asset;
-            asset = await _db.Asset.FindAsync(id);
+            asset = await _db.Asset.FindAsync(id);//look for asset
+
 
             if (asset == null)
                 return TypedResults.NotFound(asset);
+
+            IQueryable<AssetTypeModel> assetTypeRef = _db.AssetType.Where(x => x.Id == asset.AssetTypeId); //look for assetType of asset
 
             var assetDTO = new AssetModelDTO()
             {
@@ -101,7 +106,8 @@ namespace Company.Controllers
                 Name = asset.Name,
                 CreatedAt = asset.CreatedAt,
                 UpdatedAt = asset.UpdatedAt,
-                AssetTypeId= asset.AssetTypeId,
+                AssetType = (AssetTypeDTO)assetTypeRef, //convert to dto
+
             };
             return TypedResults.Ok(assetDTO);
         }
@@ -112,16 +118,19 @@ namespace Company.Controllers
         [HttpGet]
         public async Task<IResult> ReadAllAsset(MyDbContext _db)
         {
-            var assetDTO = await _db.Asset.Select(asset => new AssetModelDTO()
-            {
+            var assets = await _db.Asset.ToListAsync();
+            var assetTypes = await _db.AssetType.ToListAsync();
+            
+            //foreach (var asset in assets)
+            //{
+            //    var assetDTO = new AssetModelDTO();
+            //}
+            
+            
+            AssetTypeDTO assetType = new();
+            await assetType.MapFields(_db);
 
-                Id = asset.Id, //?
-                Name = asset.Name,
-                CreatedAt = asset.CreatedAt,
-                UpdatedAt = asset.UpdatedAt,
-                AssetTypeId= asset.AssetTypeId,
-            }).ToListAsync();
-
+            
 
             return TypedResults.Ok(assetDTO);
 

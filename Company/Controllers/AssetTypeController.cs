@@ -105,7 +105,7 @@ namespace Company.Controllers
             if (lookup == null)
                 return TypedResults.BadRequest("Search term cannot be empty.");
 
-            IQueryable<AssetTypeModel> assetTypeDb = _db.AssetType; //?
+            IQueryable<AssetTypeModel> assetTypeDb = _db.AssetType; 
 
 
             // Filters
