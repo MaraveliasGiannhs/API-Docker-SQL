@@ -10,17 +10,33 @@ namespace Company.Models
 
 
 
-        public async Task<List<AssetTypeDTO>> MapFields(MyDbContext _db)
+        public static async Task<List<AssetTypeDTO>> MapFields(MyDbContext _db, List<AssetTypeModel> assetTypes)
         {
-            var assets = await _db.Asset.Select(a => a.AssetTypeId).ToListAsync(); //select all AssetTypeIds
+            List<AssetTypeDTO> assetTypeDTO = new List<AssetTypeDTO>();
+            var asset = _db.Asset.FindAsync();
 
-            var assetTypes = await _db.AssetType.Where(a => assets.Contains(a.Id)).Select(assetType => new AssetTypeDTO() //filter, select and map
+            foreach (var a in assetTypes)
             {
-                Id = assetType.Id,
-                Name = assetType.Name,
-            }).ToListAsync();
 
-            return assetTypes;
+                AssetTypeDTO assetType = new AssetTypeDTO();
+                assetType.Id = a.Id;
+                assetType.Name = a.Name;
+                if(assetType.Id == asset.AssetTypeId)
+                assetTypeDTO.Add(assetType);
+
+            }
+
+            return assetTypeDTO;
+
+
+            //var assets = asset.Select(a => a.AssetTypeId).ToList(); //select all AssetTypeIds
+
+            //var assetTypes = assetType.Where(a => assets.Contains(a.Id)).Select(assetType => new AssetTypeDTO() //filter, select and map
+            //{
+            //    Id = assetType.Id,
+            //    Name = assetType.Name,
+            //}).ToList();
+
         }
 
     }

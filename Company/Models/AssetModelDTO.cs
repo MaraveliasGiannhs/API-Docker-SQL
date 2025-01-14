@@ -15,23 +15,38 @@ namespace Company.Models
         //public Guid AssetTypeId { get; set; }
         public AssetTypeDTO AssetType { get; set; } //id, name
 
-        public async Task<List<AssetModelDTO>> MapFields(MyDbContext _db, List<AssetModel> asset, List<AssetTypeDTO> assetTypes)
+        public static async Task<List<AssetModelDTO>> MapAssets(MyDbContext _db)
         {
-        
-            //foreach (var assetType in assetTypes)
-            //{
-            //}
+            var asset = _db.Asset.ToList();
 
-            var assetDTO = asset.Select(asset => new AssetModelDTO()
+            List<AssetModelDTO> assetDTO = new List<AssetModelDTO>();
+
+            var assetTypes = await _db.AssetType.ToListAsync();
+
+            foreach (var a in asset)
             {
-                Id = asset.Id,
-                Name = asset.Name,
-                CreatedAt = asset.CreatedAt,
-                UpdatedAt = asset.UpdatedAt,
-                AssetType = assetTypes.FirstOrDefault(x => x.Id == asset.AssetTypeId)
-            }).ToList();
+                AssetModelDTO assetModelDTO = new AssetModelDTO();
+                assetModelDTO.Id = a.Id;
+                assetModelDTO.Name = a.Name;
+                assetModelDTO.CreatedAt = a.CreatedAt;
+                assetModelDTO.UpdatedAt = a.UpdatedAt;
+
+                List<AssetTypeDTO> assetTypeDTOs = await AssetTypeDTO.MapAssetTypes(_db, assetTypes, a); //why list?
+                assetModelDTO.AssetType = assetTypeDTOs?.FirstOrDefault();
+
+                assetDTO.Add(assetModelDTO);
+            }
 
             return assetDTO;
+
+            //var assetDTO = asset.Select(asset => new AssetModelDTO()
+            //{
+            //    Id = asset.Id,
+            //    Name = asset.Name,
+            //    CreatedAt = asset.CreatedAt,
+            //    UpdatedAt = asset.UpdatedAt,
+            //    AssetType = assetTypes.FirstOrDefault(x => x.Id == asset.AssetTypeId)
+            //}).ToList();
 
         }
     }
