@@ -1,7 +1,5 @@
-using System.Reflection.Metadata.Ecma335;
 using Company.Data;
 using Company.Models;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

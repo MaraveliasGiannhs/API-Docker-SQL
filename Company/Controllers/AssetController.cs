@@ -1,10 +1,8 @@
 ﻿using Company.Data;
 using Company.Lookup;
 using Company.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace Company.Controllers
 {
@@ -37,7 +35,7 @@ namespace Company.Controllers
                     Name = assetDTO.Name,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow,
-                    AssetTypeId = assetDTO.AssetType.Id,
+                    AssetTypeId = assetDTO.AssetType.Id.Value,
                 };
 
                 await _db.Asset.AddAsync(asset); //add to db
@@ -57,7 +55,7 @@ namespace Company.Controllers
             }
             else //put
             {
-                var asset = await _db.Asset.FindAsync(assetDTO.Id);
+                AssetModel asset = await _db.Asset.FindAsync(assetDTO.Id);
 
                 if (asset == null)
                     return TypedResults.NotFound(asset);
@@ -66,7 +64,7 @@ namespace Company.Controllers
                 asset.Name = assetDTO.Name;
                 //asset.CreatedAt = assetDTO.CreatedAt;
                 asset.UpdatedAt = DateTime.UtcNow;
-                asset.AssetTypeId = assetDTO.AssetType.Id;
+                asset.AssetTypeId = assetDTO.AssetType.Id.Value;
 
                 var newAssetDTO = new AssetModelDTO()
                 {
@@ -119,9 +117,9 @@ namespace Company.Controllers
         public async Task<IResult> ReadAllAsset(MyDbContext _db)
         {
 
-            var asset = _db.Asset.ToList();
+            List<AssetModel> asset = await _db.Asset.ToListAsync();
             //AssetModelDTO assetDTO = new AssetModelDTO();
-            var assetDTO = AssetModelDTO.MapAssets(_db, asset);
+            List<AssetModelDTO> assetDTO = await AssetModelDTO.MapAssets(_db, asset);
             
 
             

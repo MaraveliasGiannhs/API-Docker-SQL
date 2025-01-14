@@ -1,6 +1,5 @@
 ﻿using Company.Data;
 using Company.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

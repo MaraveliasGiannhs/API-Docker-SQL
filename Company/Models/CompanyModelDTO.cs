@@ -1,5 +1,4 @@
-﻿using Company.Data;
-
+﻿
 namespace Company.Models
 {
 

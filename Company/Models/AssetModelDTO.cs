@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.Entity;
+﻿using Microsoft.EntityFrameworkCore;
 using Company.Data;
 
 namespace Company.Models
@@ -15,9 +14,8 @@ namespace Company.Models
         //public Guid AssetTypeId { get; set; }
         public AssetTypeDTO AssetType { get; set; } //id, name
 
-        public static async Task<List<AssetModelDTO>> MapAssets(MyDbContext _db)
+        public static async Task<List<AssetModelDTO>> MapAssets(MyDbContext _db, List<AssetModel> asset)
         {
-            var asset = _db.Asset.ToList();
 
             List<AssetModelDTO> assetDTO = new List<AssetModelDTO>();
 
@@ -31,13 +29,16 @@ namespace Company.Models
                 assetModelDTO.CreatedAt = a.CreatedAt;
                 assetModelDTO.UpdatedAt = a.UpdatedAt;
 
-                List<AssetTypeDTO> assetTypeDTOs = await AssetTypeDTO.MapAssetTypes(_db, assetTypes, a); //why list?
+                var filteredAssetTypes = assetTypes.Where(x => x.Id == a.AssetTypeId );
+
+                List<AssetTypeDTO> assetTypeDTOs = await AssetTypeDTO.MapAssetTypes(_db, filteredAssetTypes.ToList()); //why list?
                 assetModelDTO.AssetType = assetTypeDTOs?.FirstOrDefault();
 
                 assetDTO.Add(assetModelDTO);
             }
 
             return assetDTO;
+
 
             //var assetDTO = asset.Select(asset => new AssetModelDTO()
             //{

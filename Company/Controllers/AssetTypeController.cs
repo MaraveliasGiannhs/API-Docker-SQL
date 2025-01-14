@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Company.Data;
 using Company.Models;
 using Microsoft.AspNetCore.Mvc;
