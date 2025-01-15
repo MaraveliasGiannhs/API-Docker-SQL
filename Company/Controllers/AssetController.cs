@@ -1,13 +1,16 @@
-﻿using Company.Data;
-using Company.Lookup;
-using Company.Models;
+﻿using static CompanyWork.Models.AssetDTO;
+using CompanyWork.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using CompanyWork.Models;
+using CompanyWork.Lookup;
+using System.Reflection.Metadata.Ecma335;
 
-namespace Company.Controllers
+
+namespace CompanyWork.Controllers
 {
     [ApiController]
-    [Route("api/assets")] //?
+    [Route("api/assets")]
     public class AssetController : ControllerBase
     {
 
@@ -25,59 +28,67 @@ namespace Company.Controllers
 
 
         [HttpPost]
-        public async Task<IResult> CreateAsset(AssetModelDTO assetDTO)
+        public async Task<IResult> CreateAsset(AssetPersistDTO assetPersistDTO)
         {
-            if (!assetDTO.Id.HasValue) //post
-            { 
-                var asset = new AssetModel()  //add data to model
+            if (!assetPersistDTO.Id.HasValue) //post
+            {
+                Asset asset = new()  //add data to model
                 {
                     Id = Guid.NewGuid(),
-                    Name = assetDTO.Name,
+                    Name = assetPersistDTO.Name,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow,
-                    AssetTypeId = assetDTO.AssetType.Id.Value,
+                    AssetTypeId = assetPersistDTO.AssetTypeId,
                 };
 
                 await _db.Asset.AddAsync(asset); //add to db
 
                 await _db.SaveChangesAsync();  //save to db
 
-                var newAssetDTO = new AssetModelDTO()  //add to new dto to send back 
+                AssetDTO newAssetDTO = new()  //add to new dto to send back 
                 {
                     Id = asset.Id,
                     Name = asset.Name,
                     CreatedAt = asset.CreatedAt,
                     UpdatedAt = asset.UpdatedAt,
-                    AssetType = assetDTO.AssetType, //?
+                    AssetType =
+                    {
+                        Id = assetPersistDTO.AssetTypeId,
+                        Name = assetPersistDTO.Name
+                    }
                 };
 
                 return TypedResults.Ok(newAssetDTO);
             }
             else //put
             {
-                AssetModel asset = await _db.Asset.FindAsync(assetDTO.Id);
+                Asset? asset = await _db.Asset.FindAsync(assetPersistDTO.Id);
 
                 if (asset == null)
                     return TypedResults.NotFound(asset);
 
 
-                asset.Name = assetDTO.Name;
+                asset.Name = assetPersistDTO.Name;
                 //asset.CreatedAt = assetDTO.CreatedAt;
                 asset.UpdatedAt = DateTime.UtcNow;
-                asset.AssetTypeId = assetDTO.AssetType.Id.Value;
+                asset.AssetTypeId = assetPersistDTO.AssetTypeId;
 
-                var newAssetDTO = new AssetModelDTO()
+                AssetDTO newAssetDTO = new()
                 {
                     Id = asset.Id,
                     Name = asset.Name,
                     CreatedAt = asset.CreatedAt,
                     UpdatedAt = asset.UpdatedAt,
-                    AssetType = assetDTO.AssetType
+                    AssetType =
+                    {
+                        Id = assetPersistDTO.AssetTypeId,
+                        Name = assetPersistDTO.Name,
+                    }
                 };
 
                 await _db.SaveChangesAsync();
 
-                return TypedResults.Ok(assetDTO);
+                return TypedResults.Ok(assetPersistDTO);
             }
         }
 
@@ -85,59 +96,18 @@ namespace Company.Controllers
 
 
 
-        [HttpGet("{id}")]
-        public async Task<IResult> ReadAsset(Guid id)
+        
+
+        [HttpPost("search")] // + getAll
+        public async Task<ActionResult<AssetDTO>> SearchTerm(AssetLookup lookup)
         {
- 
-            AssetModel? asset;
-            asset = await _db.Asset.FindAsync(id);//look for asset
+            List<Asset> asset = await _db.Asset.ToListAsync();
+            List<AssetDTO> assetDTO = await AssetDTO.MapAssets(_db, asset);
 
-
-            if (asset == null)
-                return TypedResults.NotFound(asset);
-
-            IQueryable<AssetTypeModel> assetTypeRef = _db.AssetType.Where(x => x.Id == asset.AssetTypeId); //look for assetType of asset
-
-            var assetDTO = new AssetModelDTO()
-            {
-                Id = asset.Id,
-                Name = asset.Name,
-                CreatedAt = asset.CreatedAt,
-                UpdatedAt = asset.UpdatedAt,
-                AssetType = (AssetTypeDTO)assetTypeRef, //convert to dto
-
-            };
-            return TypedResults.Ok(assetDTO);
-        }
-
-
-
-
-        [HttpGet]
-        public async Task<IResult> ReadAllAsset(MyDbContext _db)
-        {
-
-            List<AssetModel> asset = await _db.Asset.ToListAsync();
-            //AssetModelDTO assetDTO = new AssetModelDTO();
-            List<AssetModelDTO> assetDTO = await AssetModelDTO.MapAssets(_db, asset);
-            
-
-            
-
-
-            return TypedResults.Ok(assetDTO);
-
-        }
-
-
-
-        [HttpPost("search")]
-        public async Task<IResult> SearchTerm(AssetLookup lookup)
-        {
             if (lookup == null)
-                return TypedResults.BadRequest("Search term cannot be empty.");
+                return BadRequest("Search term cannot be empty.");
 
-            IQueryable<AssetModel> assetDb = _db.Asset; //?
+            IQueryable<Asset> assetDb = _db.Asset; // all items
 
 
             // Filters
@@ -150,38 +120,9 @@ namespace Company.Controllers
 
             var searchTerm = await assetDb.ToListAsync();
 
-            return TypedResults.Ok(searchTerm);
+            return Ok(searchTerm);
         }
 
-
-        //[HttpPut("{id}")]
-        //public async Task<IResult> UpdateAsset(Guid id, AssetModelDTO assetDTO)
-        //{
-        //    var asset = await _db.Asset.FindAsync(id);
-
-        //    if (asset == null)
-        //        return TypedResults.NotFound(asset);
-
-
-        //    asset.Name = assetDTO.Name;
-        //    //asset.CreatedAt = assetDTO.CreatedAt;
-        //    asset.UpdatedAt = DateTime.UtcNow;
-        //    asset.AssetTypeId = assetDTO.AssetTypeId;
-
-        //    var newAssetDTO = new AssetModelDTO()
-        //    {
-        //        Id = asset.Id,
-        //        Name = asset.Name,
-        //        CreatedAt = asset.CreatedAt,
-        //        UpdatedAt = asset.UpdatedAt,
-        //        AssetTypeId= asset.AssetTypeId,
-        //    };
-
-        //    await _db.SaveChangesAsync();
-
-        //    return TypedResults.Ok(assetDTO);
-
-        //}
 
 
 
@@ -200,9 +141,5 @@ namespace Company.Controllers
             return TypedResults.NoContent();
 
         }
-
-
-
-
     }
 }

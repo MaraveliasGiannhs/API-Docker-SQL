@@ -1,6 +1,6 @@
-﻿using Company.Data;
+﻿ using CompanyWork.Data;
 
-namespace Company.Models
+namespace CompanyWork.Models
 {
     public class AssetTypeDTO
     {
@@ -9,19 +9,20 @@ namespace Company.Models
 
 
 
-        public static async Task<List<AssetTypeDTO>> MapAssetTypes(MyDbContext _db, List<AssetTypeModel> assetTypes)
+        public static async Task<List<AssetTypeDTO>> MapAssetTypes(MyDbContext _db, List<AssetType> assetTypes)
         {
-            List<AssetTypeDTO> assetTypeDTO = new List<AssetTypeDTO>();
+            List<AssetTypeDTO> assetTypeDTOList = new List<AssetTypeDTO>();
 
             foreach (var a in assetTypes)
             {
                 AssetTypeDTO assetType = new AssetTypeDTO();
                 assetType.Id = a.Id;
                 assetType.Name = a.Name;
-                assetTypeDTO.Add(assetType);
+
+                assetTypeDTOList.Add(assetType);
             }
 
-            return assetTypeDTO;
+            return assetTypeDTOList;
         }
 
     }

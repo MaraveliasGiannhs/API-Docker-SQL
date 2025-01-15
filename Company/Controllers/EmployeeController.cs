@@ -1,12 +1,14 @@
-﻿using Company.Data;
-using Company.Models;
+﻿using Company.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using CompanyWork.Data;
 
-namespace Company.Controllers
+
+
+namespace CompanyWork.Controllers
 {
     [ApiController]
-    [Route("api/employee")] //?
+    [Route("api/employee")] 
     public class EmployeeController : ControllerBase
     {
 
@@ -24,30 +26,27 @@ namespace Company.Controllers
 
 
         [HttpPost] 
-        public async Task<IResult> CreateEmployee(EmployeeModelDTO employeeDTO)
+        public async Task<IResult> CreateEmployee(EmployeeDTO employeeDTO)
         {
 
-            var employee = new EmployeeModel()
+            Employee employee = new()
             {
                 Id = Guid.NewGuid(),
                 Name = employeeDTO.Name,
                 StartedWorkAt = DateTime.UtcNow,
                 FinishedWorkAt = DateTime.UtcNow,
-                //
-
             };
 
             await _db.Employee.AddAsync(employee);
 
             await _db.SaveChangesAsync();
 
-            var newEmployeeDTO = new EmployeeModelDTO()
+            EmployeeDTO newEmployeeDTO = new()
             {
                 Id = employee.Id,
                 Name = employee.Name,
                 StartedWorkAt = employee.StartedWorkAt,
                 FinishedWorkAt = employee.FinishedWorkAt,
-                //
             };
 
             return TypedResults.Ok(newEmployeeDTO);
@@ -60,19 +59,18 @@ namespace Company.Controllers
         [HttpGet("{id}")]
         public async Task<IResult> ReadEmployee(Guid id)
         {
-            EmployeeModel? employee;
-            employee = await _db.Employee.FindAsync(id);
+
+            Employee? employee = await _db.Employee.FindAsync(id);
 
             if (employee == null)
                 return TypedResults.NotFound(employee);
 
-            var employeeDTO = new EmployeeModelDTO()
-            {
+            EmployeeDTO employeeDTO = new()
+            { 
                 Id = employee.Id,
                 Name = employee.Name,
                 StartedWorkAt = employee.StartedWorkAt,
                 FinishedWorkAt = employee.FinishedWorkAt,
-                 
             };
             return TypedResults.Ok(employeeDTO);
         }
@@ -83,7 +81,7 @@ namespace Company.Controllers
         [HttpGet]
         public async Task<IResult> ReadAllEmployees(MyDbContext _db)
         {
-            var employeeDTO = await _db.Employee.Select(employee => new EmployeeModelDTO()
+            var employeeDTO = await _db.Employee.Select(employee => new EmployeeDTO()
             {
 
                 Id = employee.Id, //?
@@ -103,7 +101,7 @@ namespace Company.Controllers
 
 
         [HttpPut("{id}")]
-        public async Task<IResult> UpdateEmployee(Guid id, EmployeeModelDTO employeeDTO)
+        public async Task<IResult> UpdateEmployee(Guid id, EmployeeDTO employeeDTO)
         {
             var employee = await _db.Employee.FindAsync(id);
 
@@ -116,7 +114,7 @@ namespace Company.Controllers
             employee.FinishedWorkAt = employeeDTO.FinishedWorkAt;
             //Also change WorkingPos here
 
-            var newEmployeeDTO = new EmployeeModelDTO()
+            var newEmployeeDTO = new EmployeeDTO()
             {
                 Id = employee.Id,
                 Name = employee.Name,

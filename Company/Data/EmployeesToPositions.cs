@@ -1,4 +1,4 @@
-﻿namespace Company.Data
+﻿namespace CompanyWork.Data
 {
     public class EmployeesToPositions
     {

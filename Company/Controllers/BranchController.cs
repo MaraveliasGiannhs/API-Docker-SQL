@@ -1,12 +1,14 @@
-﻿using Company.Data;
-using Company.Models;
+﻿using Company.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using CompanyWork.Data;
+ 
 
-namespace Company.Controllers
+
+namespace CompanyWork.Controllers
 {
     [ApiController]
-    [Route("api/branches")] //?
+    [Route("api/branches")] 
     public class BranchController : ControllerBase
     {
 
@@ -24,10 +26,10 @@ namespace Company.Controllers
 
 
         [HttpPost] //?
-        public async Task<IResult> CreateBranch(BranchModelDTO branchDTO)
+        public async Task<IResult> CreateBranch(BranchDTO branchDTO)
         {
 
-            var branch = new BranchModel()
+            Branch branch = new()
             {
                 Id = Guid.NewGuid(),
                 Name = branchDTO.Name,
@@ -41,7 +43,7 @@ namespace Company.Controllers
 
             await _db.SaveChangesAsync();
 
-            var newBranchDTO = new BranchModelDTO()
+            BranchDTO newBranchDTO = new()
             {
                 Id = branch.Id,
                 Name = branch.Name,
@@ -60,20 +62,20 @@ namespace Company.Controllers
         [HttpGet("{id}")]
         public async Task<IResult> ReadBranch(Guid id)
         {
-            BranchModel? branch;
-            branch = await _db.Branch.FindAsync(id);
+
+            Branch? branch = await _db.Branch.FindAsync(id);
 
             if (branch == null)
                 return TypedResults.NotFound(branch);
 
-            var branchDTO = new BranchModelDTO()
+            BranchDTO branchDTO = new()
             {
                 Id = branch.Id,
                 Name = branch.Name,
                 CreatedAt = branch.CreatedAt,
                 UpdatedAt = branch.UpdatedAt,
                 CompanyId = branch.CompanyId,
-                 
+
             };
             return TypedResults.Ok(branchDTO);
         }
@@ -84,7 +86,7 @@ namespace Company.Controllers
         [HttpGet]
         public async Task<IResult> ReadAllBranches(MyDbContext _db)
         {
-            var branchDTO = await _db.Branch.Select(branch => new BranchModelDTO()
+            var branchDTO = await _db.Branch.Select(branch => new BranchDTO()
             {
 
                 Id = branch.Id, //?
@@ -105,7 +107,7 @@ namespace Company.Controllers
 
 
         [HttpPut("{id}")]
-        public async Task<IResult> UpdateBranch(Guid id, BranchModelDTO branchDTO)
+        public async Task<IResult> UpdateBranch(Guid id, BranchDTO branchDTO)
         {
             var branch = await _db.Branch.FindAsync(id);
 
@@ -116,7 +118,7 @@ namespace Company.Controllers
             branch.Name = branchDTO.Name;
             branch.CompanyId = branchDTO.CompanyId;
 
-            var newBranchDTO = new BranchModelDTO()
+            BranchDTO newBranchDTO = new()
             {
                 Id = branch.Id,
                 Name = branch.Name,

@@ -1,6 +1,6 @@
-﻿namespace Company.Data
+﻿namespace CompanyWork.Data
 {
-    public class AssetTypeModel
+    public class AssetType
     {
         public Guid Id { get; set; }
         public string Name { get; set; }

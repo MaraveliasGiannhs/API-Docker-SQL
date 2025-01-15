@@ -1,16 +1,16 @@
-using Company.Data;
-using Company.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Company.Lookup;
+using CompanyWork.Data;
+using CompanyWork.Models;
+using CompanyWork.Lookup;
 
 
 
 
-namespace Company.Controllers
+namespace CompanyWork.Controllers
 {
     [ApiController]
-    [Route("api/assetTypes")] //?
+    [Route("api/assetTypes")] 
     public class AssetTypeController
     {
 
@@ -28,12 +28,10 @@ namespace Company.Controllers
         [HttpPost]
         public async Task<IResult> CreateAsset(AssetTypeDTO assetTypeDTO)
         {
-            //Trace.WriteLine(assetTypeDTO.Id);
-
             if (!assetTypeDTO.Id.HasValue) //create
             {
- 
-                var assetType = new AssetTypeModel()
+
+                AssetType assetType = new()
                 {
                     Id = Guid.NewGuid(),
                     Name = assetTypeDTO.Name,
@@ -43,7 +41,7 @@ namespace Company.Controllers
                 await _db.AssetType.AddAsync(assetType);
                 await _db.SaveChangesAsync();
 
-                var newAssetType = new AssetTypeDTO()
+                AssetTypeDTO newAssetType = new()
                 {
                     Id = assetType.Id,
                     Name = assetType.Name
@@ -64,7 +62,7 @@ namespace Company.Controllers
                 await _db.SaveChangesAsync();
 
 
-                var newAssetTypeDTO = new AssetTypeDTO()
+                AssetTypeDTO newAssetTypeDTO = new()
                 {
                     Id = assetType.Id,
                     Name = assetType.Name,
@@ -74,7 +72,6 @@ namespace Company.Controllers
  
                 return TypedResults.Ok(newAssetTypeDTO);
             }
-
         }
 
 
@@ -84,27 +81,29 @@ namespace Company.Controllers
         [HttpGet("{id}")]
         public async Task<IResult> ReadAsset(Guid id)
         {
-            AssetTypeModel? assetType;
-            assetType = await _db.AssetType.FindAsync(id);
+
+            AssetType? assetType = await _db.AssetType.FindAsync(id);
 
             if (assetType == null)
                 return TypedResults.NotFound(assetType);
-            var assetTypeDTO = new AssetTypeDTO()
+            AssetTypeDTO assetTypeDTO = new()
             {
                 Id = assetType.Id,
                 Name = assetType.Name,
-              };
+            };
             return TypedResults.Ok(assetTypeDTO);
         }
         
-        ////////////////////SEARCH////////////////////
+
+
+
         [HttpPost("search")]
         public async Task<IResult> SearchTerm(AssetTypeLookup lookup)
         {
             if (lookup == null)
                 return TypedResults.BadRequest("Search term cannot be empty.");
 
-            IQueryable<AssetTypeModel> assetTypeDb = _db.AssetType; 
+            IQueryable<AssetType> assetTypeDb = _db.AssetType; 
 
 
             // Filters
@@ -124,6 +123,9 @@ namespace Company.Controllers
         }
 
 
+
+
+
         [HttpGet]
         public async Task<IResult> ReadAllAsset(MyDbContext _db)
         {
@@ -139,35 +141,6 @@ namespace Company.Controllers
             return TypedResults.Ok(assetTypeDTO);
 
         }
-
-
-
-
-
-        //[HttpPut("{id}")]
-        //public async Task<IResult> UpdateAsset(Guid id, AssetTypeDTO assetTypeDTO)
-        //{
-        //    var assetType = await _db.AssetType.FindAsync(id);
-
-        //    if (assetType == null)
-        //        return TypedResults.NotFound(assetType);
-
-
-        //    assetType.Name = assetTypeDTO.Name;
-       
-
-        //    var newAssetTypeDTO = new AssetTypeDTO()
-        //    {
-        //        Id = assetType.Id,
-        //        Name = assetType.Name,
-                
-        //    };
-
-        //    await _db.SaveChangesAsync();
-
-        //    return TypedResults.Ok(newAssetTypeDTO);
-
-        //}
 
 
 

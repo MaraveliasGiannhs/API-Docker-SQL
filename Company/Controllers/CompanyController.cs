@@ -1,10 +1,12 @@
-using Company.Data;
-using Company.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Company.Models;
 
-namespace Company.Controllers
+
+namespace CompanyWork.Controllers
 {
+    using CompanyWork.Data;
+    
     [ApiController]
     [Route("api/companies")]
     public class CompanyController : ControllerBase
@@ -19,10 +21,10 @@ namespace Company.Controllers
         }
 
         [HttpPost]
-        public async Task<IResult> Create(CompanyModelDTO companyDTO)
+        public async Task<IResult> Create(CompanyDTO companyDTO)
         {
 
-            var company = new CompanyModel()
+            Company company = new()
             {
                 Id = Guid.NewGuid(),
                 Name = companyDTO.Name,
@@ -35,7 +37,7 @@ namespace Company.Controllers
             
             await _db.SaveChangesAsync();
 
-            CompanyModelDTO newCompanyDTO = new()
+            CompanyDTO newCompanyDTO = new()
             {
                 Id = company.Id,
                 Name = company.Name,
@@ -53,13 +55,12 @@ namespace Company.Controllers
         [HttpGet("{id}")]
         public async Task<IResult> Read(Guid id)
         {
-            CompanyModel? company;            
-            company = await _db.Company.FindAsync(id);
+            Company? company = await _db.Company.FindAsync(id);
             
             if(company == null)
                 return TypedResults.NotFound(company);
 
-            var companyDTO = new CompanyModelDTO()
+            CompanyDTO companyDTO = new()
             {
                 Id = company.Id,
                 Name = company.Name,
@@ -75,7 +76,7 @@ namespace Company.Controllers
         [HttpGet]
         public async Task<IResult> ReadAll(MyDbContext _db)
         {
-            var companyDTO = await _db.Company.Select(company => new CompanyModelDTO()
+            var companyDTO = await _db.Company.Select(company => new CompanyDTO()
             {
                 Id = company.Id,
                 Name = company.Name,
@@ -93,7 +94,7 @@ namespace Company.Controllers
 
 
         [HttpPut("{id}")]
-        public async Task<IResult> Update(Guid id, CompanyModelDTO companyDTO )
+        public async Task<IResult> Update(Guid id, CompanyDTO companyDTO )
         {
             var company = await _db.Company.FindAsync(id);
 
@@ -105,7 +106,7 @@ namespace Company.Controllers
             company.UpdatedAt = DateTime.UtcNow;
             //company.CreatedAt = companyDTO.CreatedAt;
 
-            CompanyModelDTO newCompanyDTO = new()
+            CompanyDTO newCompanyDTO = new()
             {
                 Id = company.Id,
                 Name = company.Name,

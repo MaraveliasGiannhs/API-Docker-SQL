@@ -1,9 +1,10 @@
-﻿using Company.Data;
-using Company.Models;
+﻿using Company.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using CompanyWork.Data;
 
-namespace Company.Controllers
+
+namespace CompanyWork.Controllers
 {
     [ApiController]
     [Route("api/workingPositions")]
@@ -19,10 +20,10 @@ namespace Company.Controllers
         }
 
         [HttpPost("/workingPosition")]
-        public async Task<IResult> CreateWorkingPos(WorkingPositionModelDTO workingPosDTO)
+        public async Task<IResult> CreateWorkingPos(WorkingPositionDTO workingPosDTO)
         {
 
-            var workingPos = new WorkingPositionModel()
+            WorkingPosition workingPos = new()
             {
                 Id = Guid.NewGuid(),
                 Name = workingPosDTO.Name,
@@ -35,7 +36,7 @@ namespace Company.Controllers
 
             await _db.SaveChangesAsync();
 
-            WorkingPositionModelDTO newWorkingPosDTO = new()
+            WorkingPositionDTO newWorkingPosDTO = new()
             {
                 Id = workingPos.Id,
                 Name = workingPos.Name,
@@ -53,13 +54,12 @@ namespace Company.Controllers
         [HttpGet("/workingPosition/{id}")]
         public async Task<IResult> ReadWorkingPos(Guid id)
         {
-            WorkingPositionModel? workingPos;
-            workingPos = await _db.WorkingPosition.FindAsync(id);
+            WorkingPosition? workingPos = await _db.WorkingPosition.FindAsync(id);
 
             if (workingPos == null)
                 return TypedResults.NotFound(workingPos);
 
-            var workingPosDTO = new CompanyModelDTO()
+            CompanyDTO workingPosDTO = new()
             {
                 Id = workingPos.Id,
                 Name = workingPos.Name,
@@ -75,7 +75,7 @@ namespace Company.Controllers
         [HttpGet("/workingPosition")]
         public async Task<IResult> ReadAllWorkingPos(MyDbContext _db)
         {
-            var workingPosDTO = await _db.WorkingPosition.Select(workingPos => new WorkingPositionModelDTO()
+            var workingPosDTO = await _db.WorkingPosition.Select(workingPos => new WorkingPositionDTO()
             {
                 Id = workingPos.Id,
                 Name = workingPos.Name,
@@ -93,7 +93,7 @@ namespace Company.Controllers
 
 
         [HttpPut("/workingPosition/{id}")]
-        public async Task<IResult> UpdateWorkingPos(Guid id, WorkingPositionModelDTO workingPosDTO)
+        public async Task<IResult> UpdateWorkingPos(Guid id, WorkingPositionDTO workingPosDTO)
         {
             var workingPos = await _db.WorkingPosition.FindAsync(id);
 
@@ -105,7 +105,7 @@ namespace Company.Controllers
             workingPos.UpdatedAt = workingPosDTO.UpdatedAt;
             workingPos.CreatedAt = workingPosDTO.CreatedAt;
 
-            WorkingPositionModelDTO newWorkingPosDTO= new()
+            WorkingPositionDTO newWorkingPosDTO = new()
             {
                 Id = workingPos.Id,
                 Name = workingPos.Name,

@@ -1,12 +1,13 @@
-﻿using Company.Data;
-using Company.Models;
+﻿using Company.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using CompanyWork.Data;
 
-namespace Company.Controllers
+
+namespace CompanyWork.Controllers
 {
     [ApiController]
-    [Route("api/etpAssets")] //?
+    [Route("api/etpAssets")] 
     public class EmployeeToPositionAsset : ControllerBase
     {
 
@@ -27,7 +28,7 @@ namespace Company.Controllers
         public async Task<IResult> CreateEtpAsset(EmployeePositionAssetDTO etpAssetDTO)
         {
 
-            var etpAsset = new EmployeePositionAssetModel()
+            EmployeePositionAsset etpAsset = new()
             {
                 Id = Guid.NewGuid(),
                 Name = etpAssetDTO.Name,
@@ -44,7 +45,7 @@ namespace Company.Controllers
 
             await _db.SaveChangesAsync();
 
-            var newEtpAssetDTO = new EmployeePositionAssetDTO()
+            EmployeePositionAssetDTO newEtpAssetDTO = new()
             {
                 Id = etpAsset.Id,
                 Name = etpAsset.Name,
@@ -54,7 +55,6 @@ namespace Company.Controllers
                 UpdatedAt = etpAsset.UpdatedAt,
                 OwnedAssetFromDateTime = etpAsset.OwnedAssetFromDateTime,
                 OwnedAssetTillDateTime = etpAsset.OwnedAssetTillDateTime,
-
             };
 
             return TypedResults.Ok(newEtpAssetDTO);
@@ -67,13 +67,13 @@ namespace Company.Controllers
         [HttpGet("/etpAsset/{id}")]
         public async Task<IResult> ReadEtpAsset(Guid id)
         {
-            EmployeePositionAssetModel? etpAsset;
-            etpAsset = await _db.EmployeePositionAsset.FindAsync(id);
+
+            EmployeePositionAsset? etpAsset = await _db.EmployeePositionAsset.FindAsync(id);
 
             if (etpAsset == null)
                 return TypedResults.NotFound(etpAsset);
 
-            var etpAssetDTO = new EmployeePositionAssetDTO()
+            EmployeePositionAssetDTO? etpAssetDTO = new()
             {
                 Id = etpAsset.Id,
                 Name = etpAsset.Name,
@@ -83,7 +83,6 @@ namespace Company.Controllers
                 UpdatedAt = etpAsset.UpdatedAt,
                 OwnedAssetFromDateTime = etpAsset.OwnedAssetFromDateTime,
                 OwnedAssetTillDateTime = etpAsset.OwnedAssetTillDateTime,
-
             };
             return TypedResults.Ok(etpAssetDTO);
         }
@@ -96,7 +95,6 @@ namespace Company.Controllers
         {
             var etpAssetDTO = await _db.EmployeePositionAsset.Select(etpAsset => new EmployeePositionAssetDTO()
             {
-
                 Id = etpAsset.Id,
                 Name = etpAsset.Name,
                 EmployeesToPositionID = etpAsset.EmployeesToPositionId,
@@ -105,7 +103,6 @@ namespace Company.Controllers
                 UpdatedAt = etpAsset.UpdatedAt,
                 OwnedAssetFromDateTime = etpAsset.OwnedAssetFromDateTime,
                 OwnedAssetTillDateTime = etpAsset.OwnedAssetTillDateTime,
-
             }).ToListAsync();
 
 
@@ -135,7 +132,7 @@ namespace Company.Controllers
             etpAsset.OwnedAssetTillDateTime = etpAssetDTO.OwnedAssetTillDateTime;
 
 
-            var newEtpAssetDTO = new EmployeePositionAssetDTO()
+            EmployeePositionAssetDTO newEtpAssetDTO = new()
             {
                 Id = etpAsset.Id,
                 Name = etpAsset.Name,

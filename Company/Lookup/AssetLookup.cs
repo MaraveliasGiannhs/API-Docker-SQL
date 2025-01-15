@@ -1,4 +1,4 @@
-﻿namespace Company.Lookup
+﻿namespace CompanyWork.Lookup
 {
     public class AssetLookup
     {

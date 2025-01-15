@@ -1,8 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Company.Data;
-using Microsoft.Extensions.Options;
-using System.Configuration;
-using Microsoft.AspNetCore.Builder;
+using CompanyWork.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 

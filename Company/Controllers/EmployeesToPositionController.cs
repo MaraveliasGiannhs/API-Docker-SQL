@@ -1,12 +1,14 @@
-﻿using Company.Data;
-using Company.Models;
+﻿using Company.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using CompanyWork.Data;
+ 
 
-namespace Company.Controllers
+
+namespace CompanyWork.Controllers
 {
     [ApiController]
-    [Route("api/employeesToPositions")] //?
+    [Route("api/employeesToPositions")] 
     public class EmployeesToPositionController : ControllerBase
     {
 
@@ -27,8 +29,8 @@ namespace Company.Controllers
         public async Task<IResult> CreateDetails(EmployeesPositionsDTO etpDTO)
         {
 
-            var etp = new EmployeesToPositions()
-            {
+            EmployeesToPositions etp = new()
+            { 
                 Id = Guid.NewGuid(),
                 StartedWorkingAt = DateTime.Now,
                 FinishedWorkingAt = DateTime.Now,  
@@ -40,7 +42,7 @@ namespace Company.Controllers
 
             await _db.SaveChangesAsync();
 
-            var newEtpDTO = new EmployeesPositionsDTO()
+            EmployeesPositionsDTO newEtpDTO = new()
             {
                 Id = Guid.NewGuid(),
                 StartedWorkingAt = DateTime.Now,
@@ -59,13 +61,13 @@ namespace Company.Controllers
         [HttpGet("/details/{id}")]
         public async Task<IResult> ReadDetails(Guid id)
         {
-            EmployeesToPositions etp;
-            etp = await _db.EmployeesToPosition.FindAsync(id);
+
+            EmployeesToPositions? etp = await _db.EmployeesToPosition.FindAsync(id);
 
             if (etp == null)
                 return TypedResults.NotFound(etp);
 
-            var etpDTO = new EmployeesPositionsDTO()
+            EmployeesPositionsDTO etpDTO = new()
             {
                 Id = etp.Id,
                 StartedWorkingAt = etp.StartedWorkingAt,
@@ -118,7 +120,7 @@ namespace Company.Controllers
             etp.EmployeeId = etpDTO.EmployeeId;
             etp.WorkPositionId = etpDTO.WorkPositionId;
 
-            var newEtpDTO = new EmployeesPositionsDTO()
+            EmployeesPositionsDTO newEtpDTO = new()
             {
                 Id = etp.Id,
                 StartedWorkingAt = etp.StartedWorkingAt,
@@ -150,9 +152,5 @@ namespace Company.Controllers
             return TypedResults.NoContent();
 
         }
-
-
-
-
     }
 }

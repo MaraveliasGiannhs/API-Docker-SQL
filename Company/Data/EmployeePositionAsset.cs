@@ -1,6 +1,6 @@
-﻿namespace Company.Data
+﻿namespace CompanyWork.Data
 {
-    public class EmployeePositionAssetModel
+    public class EmployeePositionAsset
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
