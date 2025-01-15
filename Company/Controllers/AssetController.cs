@@ -56,8 +56,10 @@ namespace CompanyWork.Controllers
                         Id = assetPersistDTO.AssetTypeId,
                         Name = assetPersistDTO.Name
                     }
-                };
+                }; //Null ref exception
 
+                if (newAssetDTO.AssetType == null)
+                    Console.WriteLine("Asset Type Not found");
                 return TypedResults.Ok(newAssetDTO);
             }
             else //put
