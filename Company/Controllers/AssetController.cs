@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CompanyWork.Models;
 using CompanyWork.Lookup;
-using System.Reflection.Metadata.Ecma335;
 
 
 namespace CompanyWork.Controllers
@@ -28,8 +27,10 @@ namespace CompanyWork.Controllers
 
 
         [HttpPost]
-        public async Task<IResult> CreateAsset(AssetPersistDTO assetPersistDTO)
+        public async Task<List<AssetDTO>> CreateAsset(AssetPersistDTO assetPersistDTO)
         {
+            
+
             if (!assetPersistDTO.Id.HasValue) //post
             {
                 Asset asset = new()  //add data to model
@@ -42,55 +43,51 @@ namespace CompanyWork.Controllers
                 };
 
                 await _db.Asset.AddAsync(asset); //add to db
-
                 await _db.SaveChangesAsync();  //save to db
 
-                AssetDTO newAssetDTO = new()  //add to new dto to send back 
-                {
-                    Id = asset.Id,
-                    Name = asset.Name,
-                    CreatedAt = asset.CreatedAt,
-                    UpdatedAt = asset.UpdatedAt,
-                    AssetType =
-                    {
-                        Id = assetPersistDTO.AssetTypeId,
-                        Name = assetPersistDTO.Name
-                    }
-                }; //Null ref exception
+                List<Asset> assetList = await _db.Asset.ToListAsync();
+                List<AssetDTO> assetDTO = await AssetDTO.MapAssets(_db, assetList);
 
-                if (newAssetDTO.AssetType == null)
-                    Console.WriteLine("Asset Type Not found");
-                return TypedResults.Ok(newAssetDTO);
+
+                return assetDTO == null ? throw new InvalidOperationException("No AssetDTO found.") : assetDTO;
             }
             else //put
             {
-                Asset? asset = await _db.Asset.FindAsync(assetPersistDTO.Id);
+                Asset? assetDb = await _db.Asset.FindAsync(assetPersistDTO.Id);
 
-                if (asset == null)
-                    return TypedResults.NotFound(asset);
+                if (assetDb == null)
+                    throw new InvalidOperationException("No Assets found in DB");
 
 
-                asset.Name = assetPersistDTO.Name;
-                //asset.CreatedAt = assetDTO.CreatedAt;
-                asset.UpdatedAt = DateTime.UtcNow;
-                asset.AssetTypeId = assetPersistDTO.AssetTypeId;
-
-                AssetDTO newAssetDTO = new()
-                {
-                    Id = asset.Id,
-                    Name = asset.Name,
-                    CreatedAt = asset.CreatedAt,
-                    UpdatedAt = asset.UpdatedAt,
-                    AssetType =
-                    {
-                        Id = assetPersistDTO.AssetTypeId,
-                        Name = assetPersistDTO.Name,
-                    }
-                };
+                
+                assetDb.Name = assetPersistDTO.Name;
+                assetDb.UpdatedAt = DateTime.UtcNow;
+                assetDb.AssetTypeId = assetPersistDTO.AssetTypeId;
 
                 await _db.SaveChangesAsync();
 
-                return TypedResults.Ok(assetPersistDTO);
+
+                List<Asset> assetList = new(); 
+                assetList.Add(assetDb);
+
+                List<AssetDTO> assetDTO = await AssetDTO.MapAssets(_db, assetList);
+
+
+                //AssetDTO newAssetDTO = new()
+                //{
+                //    Id = asset.Id,
+                //    Name = asset.Name,
+                //    CreatedAt = asset.CreatedAt,
+                //    UpdatedAt = asset.UpdatedAt,
+                //    AssetType =
+                //    {
+                //        Id = asset.AssetTypeId,
+                //        Name = assetPersistDTO.Name,
+                //    }
+                //};
+
+
+                return assetDTO;
             }
         }
 
@@ -101,11 +98,8 @@ namespace CompanyWork.Controllers
         
 
         [HttpPost("search")] // + getAll
-        public async Task<ActionResult<AssetDTO>> SearchTerm(AssetLookup lookup)
+        public async Task<ActionResult<List<AssetDTO>>> SearchTerm(AssetLookup lookup)
         {
-            List<Asset> asset = await _db.Asset.ToListAsync();
-            List<AssetDTO> assetDTO = await AssetDTO.MapAssets(_db, asset);
-
             if (lookup == null)
                 return BadRequest("Search term cannot be empty.");
 
@@ -120,12 +114,24 @@ namespace CompanyWork.Controllers
                 assetDb = assetDb.Where(a => a.Id == lookup.Id.Value);
 
 
-            var searchTerm = await assetDb.ToListAsync();
+            List<Asset> asset = await assetDb.ToListAsync();
+            List<AssetDTO> assetDTO = await AssetDTO.MapAssets(_db, asset);
 
-            return Ok(searchTerm);
+            return assetDTO;
         }
 
+        [HttpGet("{id}")]
+        public async Task<ActionResult<List<AssetDTO>>> ReadAsset(Guid id)
+        {
+            var asset = await _db.Asset.FindAsync(id);
 
+            if (asset == null)
+                return BadRequest("Asset doesnt exist.");
+
+            List<AssetDTO> assetDTO = await MapAssets(_db, new List<Asset> { asset });
+
+            return assetDTO;
+        }
 
 
 

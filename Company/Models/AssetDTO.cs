@@ -18,21 +18,23 @@ namespace CompanyWork.Models
         public static async Task<List<AssetDTO>> MapAssets(MyDbContext _db, List<Asset> assets)
         {
 
-            List<AssetDTO> assetListDTO = new List<AssetDTO>();
+            List<AssetDTO> assetListDTO = new();
 
             List<AssetType> assetTypes = await _db.AssetType.ToListAsync();
 
             foreach (var asset in assets)
             {
-                AssetDTO assetDTO = new AssetDTO();
-                assetDTO.Id = asset.Id;
-                assetDTO.Name = asset.Name;
-                assetDTO.CreatedAt = asset.CreatedAt;
-                assetDTO.UpdatedAt = asset.UpdatedAt;
+                AssetDTO assetDTO = new()
+                {
+                    Id = asset.Id,
+                    Name = asset.Name,
+                    CreatedAt = asset.CreatedAt,
+                    UpdatedAt = DateTime.UtcNow,
+                };
 
                 var filteredAssetTypes = assetTypes.Where(x => x.Id == asset.AssetTypeId);
 
-                List<AssetTypeDTO> assetTypeDTOs = await AssetTypeDTO.MapAssetTypes(_db, filteredAssetTypes.ToList()); //why list?
+                List<AssetTypeDTO> assetTypeDTOs = await AssetTypeDTO.MapAssetTypes(_db, filteredAssetTypes.ToList()); 
                 assetDTO.AssetType = assetTypeDTOs?.FirstOrDefault();
 
                 assetListDTO.Add(assetDTO);
