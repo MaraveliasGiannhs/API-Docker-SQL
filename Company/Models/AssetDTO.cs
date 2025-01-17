@@ -29,7 +29,7 @@ namespace CompanyWork.Models
                     Id = asset.Id,
                     Name = asset.Name,
                     CreatedAt = asset.CreatedAt,
-                    UpdatedAt = DateTime.UtcNow,
+                    UpdatedAt = asset.UpdatedAt,
                 };
 
                 var filteredAssetTypes = assetTypes.Where(x => x.Id == asset.AssetTypeId);

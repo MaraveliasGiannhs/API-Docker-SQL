@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CompanyWork.Models;
 using CompanyWork.Lookup;
+using CompanyWork.Services;
+using CompanyWork.Interfaces;
 
 
 namespace CompanyWork.Controllers
@@ -12,15 +14,14 @@ namespace CompanyWork.Controllers
     [Route("api/assets")]
     public class AssetController : ControllerBase
     {
-
-
         private readonly ILogger<AssetController> _logger;
         private readonly MyDbContext _db;
-
-        public AssetController(ILogger<AssetController> logger, MyDbContext db)
+        private readonly AssetPost _assetPostService;
+        public AssetController(ILogger<AssetController> logger,MyDbContext db,AssetPost assetPostService)
         {
             _logger = logger;
             _db = db;
+            _assetPostService = assetPostService;
         }
 
 
@@ -29,27 +30,30 @@ namespace CompanyWork.Controllers
         [HttpPost]
         public async Task<List<AssetDTO>> CreateAsset(AssetPersistDTO assetPersistDTO)
         {
-            
-
             if (!assetPersistDTO.Id.HasValue) //post
             {
-                Asset asset = new()  //add data to model
-                {
-                    Id = Guid.NewGuid(),
-                    Name = assetPersistDTO.Name,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow,
-                    AssetTypeId = assetPersistDTO.AssetTypeId,
-                };
 
-                await _db.Asset.AddAsync(asset); //add to db
-                await _db.SaveChangesAsync();  //save to db
+                return await _assetPostService.GetAssetsAsync(assetPersistDTO);
+                //Asset asset = new()  //add data to model
+                //{
+                //    Id = Guid.NewGuid(),
+                //    Name = assetPersistDTO.Name,
+                //    CreatedAt = DateTime.UtcNow,
+                //    UpdatedAt = DateTime.UtcNow,
+                //    AssetTypeId = assetPersistDTO.AssetTypeId,
+                //};
 
-                List<Asset> assetList = await _db.Asset.ToListAsync();
-                List<AssetDTO> assetDTO = await AssetDTO.MapAssets(_db, assetList);
+                //await _db.Asset.AddAsync(asset); //add to db
+                //await _db.SaveChangesAsync();  //save to db
+
+                //List<Asset> assetList = await _db.Asset.ToListAsync();
+                //List<AssetDTO> assetDTO = await AssetDTO.MapAssets(_db, assetList);
 
 
-                return assetDTO == null ? throw new InvalidOperationException("No AssetDTO found.") : assetDTO;
+                //return assetDTO == null ? throw new InvalidOperationException("No AssetDTO found.") : assetDTO;
+                
+                //var a = await _assetPostService.GetAssetsAsync(assetPersistDTO);
+                //return a;
             }
             else //put
             {
@@ -58,21 +62,18 @@ namespace CompanyWork.Controllers
                 if (assetDb == null)
                     throw new InvalidOperationException("No Assets found in DB");
 
-
-                
                 assetDb.Name = assetPersistDTO.Name;
                 assetDb.UpdatedAt = DateTime.UtcNow;
                 assetDb.AssetTypeId = assetPersistDTO.AssetTypeId;
 
+ 
+
+                List<Asset> assetDtoList = new();
+                assetDtoList.Add(assetDb);
+
+                List<AssetDTO> assetDTO = await AssetDTO.MapAssets(_db, assetDtoList);
+
                 await _db.SaveChangesAsync();
-
-
-                List<Asset> assetList = new(); 
-                assetList.Add(assetDb);
-
-                List<AssetDTO> assetDTO = await AssetDTO.MapAssets(_db, assetList);
-
-
                 //AssetDTO newAssetDTO = new()
                 //{
                 //    Id = asset.Id,
@@ -94,9 +95,6 @@ namespace CompanyWork.Controllers
 
 
 
-
-        
-
         [HttpPost("search")] // + getAll
         public async Task<ActionResult<List<AssetDTO>>> SearchTerm(AssetLookup lookup)
         {
@@ -114,11 +112,14 @@ namespace CompanyWork.Controllers
                 assetDb = assetDb.Where(a => a.Id == lookup.Id.Value);
 
 
-            List<Asset> asset = await assetDb.ToListAsync();
-            List<AssetDTO> assetDTO = await AssetDTO.MapAssets(_db, asset);
+            List<Asset> assetList = await assetDb.ToListAsync();
+            List<AssetDTO> assetDTO = await AssetDTO.MapAssets(_db, assetList);
 
             return assetDTO;
         }
+
+
+
 
         [HttpGet("{id}")]
         public async Task<ActionResult<List<AssetDTO>>> ReadAsset(Guid id)
