@@ -4,9 +4,9 @@ using static CompanyWork.Models.AssetDTO;
 
 namespace CompanyWork.Interfaces
 {
-    public interface IPost<T,C>
+    public interface IPostUpdate<T,C>
     {
-        Task<List<T>> PostAsync(C persistDTO);
+        Task<List<T>> PostUpdateAsync(C persistDTO);
 
     }
 

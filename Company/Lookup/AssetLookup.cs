@@ -5,7 +5,7 @@
         public Guid? Id { get; set; }
         public string Like { get; set; }
 
-        //add paging and ordering
+        //add paging and ordering ?
 
     }
 }

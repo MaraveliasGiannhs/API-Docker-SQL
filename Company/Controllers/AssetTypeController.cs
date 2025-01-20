@@ -20,8 +20,7 @@ namespace CompanyWork.Controllers
         private readonly ILogger<AssetTypeController> _logger;
         private readonly MyDbContext _db;
 
-        private readonly AssetTypePost _assetTypePost;
-        private readonly AssetTypeUpdate _assetTypeUpdate;
+        private readonly AssetTypePostUpdate _assetTypePost;
         private readonly AssetTypeDelete _assetTypeDelete;  
         private readonly AssetTypeSearch _assetTypeSearch;
         private readonly AssetTypeGetById _assetTypeGetById;
@@ -29,8 +28,7 @@ namespace CompanyWork.Controllers
         public AssetTypeController(
             ILogger<AssetTypeController> logger,
             MyDbContext db,
-            AssetTypePost assetTypePost,
-            AssetTypeUpdate assetTypeUpdate,
+            AssetTypePostUpdate assetTypePost,
             AssetTypeDelete assetTypeDelete,
             AssetTypeSearch assetTypeSearch,
             AssetTypeGetById assetTypeGetById)
@@ -38,7 +36,6 @@ namespace CompanyWork.Controllers
             _logger = logger;
             _db = db;
             _assetTypePost = assetTypePost;
-            _assetTypeUpdate = assetTypeUpdate;
             _assetTypeDelete = assetTypeDelete;
             _assetTypeSearch = assetTypeSearch;
             _assetTypeGetById = assetTypeGetById;
@@ -49,14 +46,7 @@ namespace CompanyWork.Controllers
         [HttpPost]
         public async Task<List<AssetTypeDTO>> CreateAssetType(AssetTypePersistDTO assetTypePersist)
         {
-            if (!assetTypePersist.Id.HasValue) //create
-            {
-                return await _assetTypePost.PostAsync(assetTypePersist);
-            }
-            else //update
-            {
-                return await _assetTypeUpdate.UpdateAsync(assetTypePersist);    
-            }
+            return await _assetTypePost.PostUpdateAsync(assetTypePersist);
         }
 
 
@@ -82,9 +72,9 @@ namespace CompanyWork.Controllers
 
 
         [HttpDelete("{id}")]
-        public async Task<IResult> DeleteAssetType(Guid id)
+        public void DeleteAssetType(Guid id)
         {
-            return await _assetTypeDelete.DeleteAsync(id);
+            _assetTypeDelete.DeleteAsync(id);
 
         }
     }
