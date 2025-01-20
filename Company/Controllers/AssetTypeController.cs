@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using CompanyWork.Data;
 using CompanyWork.Models;
 using CompanyWork.Lookup;
+using System.Collections.Generic;
+using CompanyWork.PersistClasses;
+using CompanyWork.Services.AssetTypeServices;
 
 
 
@@ -17,60 +20,42 @@ namespace CompanyWork.Controllers
         private readonly ILogger<AssetTypeController> _logger;
         private readonly MyDbContext _db;
 
-        public AssetTypeController(ILogger<AssetTypeController> logger, MyDbContext db)
+        private readonly AssetTypePost _assetTypePost;
+        private readonly AssetTypeUpdate _assetTypeUpdate;
+        private readonly AssetTypeDelete _assetTypeDelete;  
+        private readonly AssetTypeSearch _assetTypeSearch;
+        private readonly AssetTypeGetById _assetTypeGetById;
+
+        public AssetTypeController(
+            ILogger<AssetTypeController> logger,
+            MyDbContext db,
+            AssetTypePost assetTypePost,
+            AssetTypeUpdate assetTypeUpdate,
+            AssetTypeDelete assetTypeDelete,
+            AssetTypeSearch assetTypeSearch,
+            AssetTypeGetById assetTypeGetById)
         {
             _logger = logger;
             _db = db;
+            _assetTypePost = assetTypePost;
+            _assetTypeUpdate = assetTypeUpdate;
+            _assetTypeDelete = assetTypeDelete;
+            _assetTypeSearch = assetTypeSearch;
+            _assetTypeGetById = assetTypeGetById;
         }
 
 
 
         [HttpPost]
-        public async Task<IResult> CreateAsset(AssetTypeDTO assetTypeDTO)
+        public async Task<List<AssetTypeDTO>> CreateAssetType(AssetTypePersistDTO assetTypePersist)
         {
-            if (!assetTypeDTO.Id.HasValue) //create
+            if (!assetTypePersist.Id.HasValue) //create
             {
-
-                AssetType assetType = new()
-                {
-                    Id = Guid.NewGuid(),
-                    Name = assetTypeDTO.Name,
-
-                };
-
-                await _db.AssetType.AddAsync(assetType);
-                await _db.SaveChangesAsync();
-
-                AssetTypeDTO newAssetType = new()
-                {
-                    Id = assetType.Id,
-                    Name = assetType.Name
-                };
-
-                return TypedResults.Ok(newAssetType);
+                return await _assetTypePost.PostAsync(assetTypePersist);
             }
             else //update
             {
-
-                var assetType = await _db.AssetType.FindAsync(assetTypeDTO.Id);
-
-                if (assetType == null)
-                    return TypedResults.NotFound(assetType);
-
-
-                assetType.Name = assetTypeDTO.Name;
-                await _db.SaveChangesAsync();
-
-
-                AssetTypeDTO newAssetTypeDTO = new()
-                {
-                    Id = assetType.Id,
-                    Name = assetType.Name,
-
-                };
-
- 
-                return TypedResults.Ok(newAssetTypeDTO);
+                return await _assetTypeUpdate.UpdateAsync(assetTypePersist);    
             }
         }
 
@@ -79,84 +64,27 @@ namespace CompanyWork.Controllers
 
 
         [HttpGet("{id}")]
-        public async Task<IResult> ReadAsset(Guid id)
+        public async Task<ActionResult<List<AssetTypeDTO>>> ReadAssetType(Guid id)
         {
-
-            AssetType? assetType = await _db.AssetType.FindAsync(id);
-
-            if (assetType == null)
-                return TypedResults.NotFound(assetType);
-            AssetTypeDTO assetTypeDTO = new()
-            {
-                Id = assetType.Id,
-                Name = assetType.Name,
-            };
-            return TypedResults.Ok(assetTypeDTO);
-        }
-        
-
-
-
-        [HttpPost("search")]
-        public async Task<IResult> SearchTerm(AssetTypeLookup lookup)
-        {
-            if (lookup == null)
-                return TypedResults.BadRequest("Search term cannot be empty.");
-
-            IQueryable<AssetType> assetTypeDb = _db.AssetType; 
-
-
-            // Filters
-            if (!string.IsNullOrWhiteSpace(lookup.Like))
-                assetTypeDb = assetTypeDb.Where(a => a.Name.Contains(lookup.Like.ToLower()));
-
-            if (lookup.Id.HasValue)
-                assetTypeDb = assetTypeDb.Where(a => a.Id == lookup.Id.Value);
-                
-
-    
-            
-
-            var searchTerm = await assetTypeDb.ToListAsync(); 
-
-            return TypedResults.Ok(searchTerm);
+            return await _assetTypeGetById.GetByIdAsync(id);
         }
 
 
 
 
-
-        [HttpGet]
-        public async Task<IResult> ReadAllAsset(MyDbContext _db)
+        [HttpPost("search")] //+ReadAll
+        public async Task<List<AssetTypeDTO>> SearchTerm(AssetTypeLookup lookup)
         {
-            var assetTypeDTO = await _db.AssetType.Select(assetType => new AssetTypeDTO()
-            {
-
-                Id = assetType.Id, //?
-                Name = assetType.Name,
-
-            }).ToListAsync();
-
-
-            return TypedResults.Ok(assetTypeDTO);
-
+            return await _assetTypeSearch.SearchTermAsync(lookup);
         }
 
 
 
 
         [HttpDelete("{id}")]
-        public async Task<IResult> DeleteAsset(Guid id)
+        public async Task<IResult> DeleteAssetType(Guid id)
         {
-            var assetType = await _db.AssetType.FindAsync(id);
-
-            if (assetType == null)
-                return TypedResults.NotFound();
-
-            _db.AssetType.Remove(assetType);
-            await _db.SaveChangesAsync();
-
-            return TypedResults.NoContent();
+            return await _assetTypeDelete.DeleteAsync(id);
 
         }
     }

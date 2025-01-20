@@ -1,11 +1,10 @@
 ﻿using static CompanyWork.Models.AssetDTO;
 using CompanyWork.Data;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using CompanyWork.Models;
 using CompanyWork.Lookup;
-using CompanyWork.Services;
-using CompanyWork.Interfaces;
+using CompanyWork.PersistClasses;
+using CompanyWork.Services.AssetServices;
 
 
 namespace CompanyWork.Controllers
@@ -49,11 +48,11 @@ namespace CompanyWork.Controllers
         {
             if (!assetPersistDTO.Id.HasValue) //post
             {
-                return await _assetPostService.PostAssetsAsync(assetPersistDTO);   
+                return await _assetPostService.PostAsync(assetPersistDTO);   
             }
             else //put
             {
-                return await _assetUpdateService.UpdateAsset(assetPersistDTO);
+                return await _assetUpdateService.UpdateAsync(assetPersistDTO);
             }
         }
 
@@ -63,7 +62,7 @@ namespace CompanyWork.Controllers
         [HttpPost("search")] // + getAll
         public async Task<ActionResult<List<AssetDTO>>> SearchTerm(AssetLookup lookup)
         {
-            return await _assetSearchService.SearchTerm(lookup);
+            return await _assetSearchService.SearchTermAsync(lookup);
         }
 
 
@@ -72,7 +71,7 @@ namespace CompanyWork.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<List<AssetDTO>>> ReadAsset(Guid id)
         {
-            return await _assetGetByIdService.ReadAsset(id);
+            return await _assetGetByIdService.GetByIdAsync(id);
         }
 
 
@@ -80,7 +79,7 @@ namespace CompanyWork.Controllers
         [HttpDelete("{id}")]
         public async Task<IResult> DeleteAsset(Guid id)
         {
-            return await _assetDeleteService.DeleteAsset(id);
+            return await _assetDeleteService.DeleteAsync(id);
         }
     }
 }
