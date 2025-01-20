@@ -8,17 +8,15 @@ namespace CompanyWork.Services.AssetServices
     {
         private readonly MyDbContext _db = db;
 
-        public async Task<IResult> DeleteAsync(Guid id)
+        public async void DeleteAsync(Guid id)
         {
             var asset = await _db.Asset.FindAsync(id);
 
             if (asset == null)
-                return TypedResults.NotFound();
+                throw new ApplicationException();
 
             _db.Asset.Remove(asset);
             await _db.SaveChangesAsync();
-
-            return TypedResults.NoContent();
             
         }
     }
