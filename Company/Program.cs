@@ -12,15 +12,13 @@ var config = builder.Configuration;
 
 //For DI
 //Asset
-builder.Services.AddScoped<AssetPost>();
-builder.Services.AddScoped<AssetUpdate>();
+builder.Services.AddScoped<AssetPostUpdate>();
 builder.Services.AddScoped<AssetSearch>();
 builder.Services.AddScoped<AssetDelete>();
 builder.Services.AddScoped<AssetGetById>();
 
 //AssetType
-builder.Services.AddScoped<AssetTypePost>();
-builder.Services.AddScoped<AssetTypeUpdate>();
+builder.Services.AddScoped<AssetTypePostUpdate>();
 builder.Services.AddScoped<AssetTypeSearch>();
 builder.Services.AddScoped<AssetTypeDelete>();
 builder.Services.AddScoped<AssetTypeGetById>();
