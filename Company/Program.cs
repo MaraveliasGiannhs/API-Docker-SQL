@@ -1,7 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using CompanyWork.Data;
 using CompanyWork.Interfaces;
-using CompanyWork.Services;
+using CompanyWork.Services.AssetServices;
+using CompanyWork.Services.AssetTypeServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,14 +10,23 @@ var config = builder.Configuration;
 // Add services to the container.
 
 
-//for DI
+//For DI
+//Asset
 builder.Services.AddScoped<AssetPost>();
 builder.Services.AddScoped<AssetUpdate>();
 builder.Services.AddScoped<AssetSearch>();
 builder.Services.AddScoped<AssetDelete>();
 builder.Services.AddScoped<AssetGetById>();
 
-//builder.Services.AddTransient<IPost, AssetPost>();
+//AssetType
+builder.Services.AddScoped<AssetTypePost>();
+builder.Services.AddScoped<AssetTypeUpdate>();
+builder.Services.AddScoped<AssetTypeSearch>();
+builder.Services.AddScoped<AssetTypeDelete>();
+builder.Services.AddScoped<AssetTypeGetById>();
+
+
+//builder.Services.AddTransient<IPost, AssetPost>();    //??
 
 
 builder.Services.AddDbContext<MyDbContext>(options => options.UseSqlServer(config.GetConnectionString("DefaultConnection")));
