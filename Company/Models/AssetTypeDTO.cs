@@ -13,13 +13,13 @@ namespace CompanyWork.Models
         {
             List<AssetTypeDTO> assetTypeDTOList = new List<AssetTypeDTO>();
 
-            foreach (var a in assetTypes)
+            foreach (var assetTypeItem in assetTypes)
             {
-                AssetTypeDTO assetType = new AssetTypeDTO();
-                assetType.Id = a.Id;
-                assetType.Name = a.Name;
+                AssetTypeDTO assetTypeDTO = new AssetTypeDTO();
+                assetTypeDTO.Id = assetTypeItem.Id;
+                assetTypeDTO.Name = assetTypeItem.Name;
 
-                assetTypeDTOList.Add(assetType);
+                assetTypeDTOList.Add(assetTypeDTO);
             }
 
             return assetTypeDTOList;
