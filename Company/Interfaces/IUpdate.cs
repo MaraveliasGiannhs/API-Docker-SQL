@@ -1,11 +1,12 @@
 ﻿using CompanyWork.Models;
+using CompanyWork.PersistClasses;
 using static CompanyWork.Models.AssetDTO;
 
 namespace CompanyWork.Interfaces
 {
-    public interface IUpdate
+    public interface IUpdate<T, C>
     {
-        Task<List<AssetDTO>> UpdateAsset(AssetPersistDTO assetPersistDTO);
+        Task<List<T>> UpdateAsync(C persistDTO);
 
     }
 }

@@ -2,6 +2,6 @@
 {
     public interface IDelete
     {
-        Task<IResult> DeleteAsset(Guid id);
+        Task<IResult> DeleteAsync(Guid id);
     }
 }

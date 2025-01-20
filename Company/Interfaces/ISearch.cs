@@ -4,9 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CompanyWork.Interfaces
 {
-    public interface ISearch
+    public interface ISearch<T,C>
     {
-        Task<ActionResult<List<AssetDTO>>> SearchTerm(AssetLookup lookup);
-
+        Task<List<T>> SearchTermAsync(C lookup);
     }
 }

@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CompanyWork.Interfaces
 {
-    public interface IGetById
+    public interface IGetById<T>
     {
-        Task<ActionResult<List<AssetDTO>>> ReadAsset(Guid id);
+        Task<ActionResult<List<T>>> GetByIdAsync(Guid id);
     }
 }
