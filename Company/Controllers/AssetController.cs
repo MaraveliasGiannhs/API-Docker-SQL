@@ -16,12 +16,29 @@ namespace CompanyWork.Controllers
     {
         private readonly ILogger<AssetController> _logger;
         private readonly MyDbContext _db;
+
         private readonly AssetPost _assetPostService;
-        public AssetController(ILogger<AssetController> logger,MyDbContext db,AssetPost assetPostService)
+        private readonly AssetUpdate _assetUpdateService;
+        private readonly AssetSearch _assetSearchService;
+        private readonly AssetDelete _assetDeleteService;
+        private readonly AssetGetById _assetGetByIdService;
+
+        public AssetController(
+            ILogger<AssetController> logger,
+            MyDbContext db,
+            AssetPost assetPostService,
+            AssetUpdate assetUpdateService,
+            AssetSearch assetSearchService,
+            AssetGetById assetGetById,
+            AssetDelete assetDelete)
         {
             _logger = logger;
             _db = db;
             _assetPostService = assetPostService;
+            _assetUpdateService = assetUpdateService;
+            _assetSearchService = assetSearchService;
+            _assetDeleteService = assetDelete;
+            _assetGetByIdService = assetGetById;
         }
 
 
@@ -32,63 +49,11 @@ namespace CompanyWork.Controllers
         {
             if (!assetPersistDTO.Id.HasValue) //post
             {
-
-                return await _assetPostService.GetAssetsAsync(assetPersistDTO);
-                //Asset asset = new()  //add data to model
-                //{
-                //    Id = Guid.NewGuid(),
-                //    Name = assetPersistDTO.Name,
-                //    CreatedAt = DateTime.UtcNow,
-                //    UpdatedAt = DateTime.UtcNow,
-                //    AssetTypeId = assetPersistDTO.AssetTypeId,
-                //};
-
-                //await _db.Asset.AddAsync(asset); //add to db
-                //await _db.SaveChangesAsync();  //save to db
-
-                //List<Asset> assetList = await _db.Asset.ToListAsync();
-                //List<AssetDTO> assetDTO = await AssetDTO.MapAssets(_db, assetList);
-
-
-                //return assetDTO == null ? throw new InvalidOperationException("No AssetDTO found.") : assetDTO;
-                
-                //var a = await _assetPostService.GetAssetsAsync(assetPersistDTO);
-                //return a;
+                return await _assetPostService.PostAssetsAsync(assetPersistDTO);   
             }
             else //put
             {
-                Asset? assetDb = await _db.Asset.FindAsync(assetPersistDTO.Id);
-
-                if (assetDb == null)
-                    throw new InvalidOperationException("No Assets found in DB");
-
-                assetDb.Name = assetPersistDTO.Name;
-                assetDb.UpdatedAt = DateTime.UtcNow;
-                assetDb.AssetTypeId = assetPersistDTO.AssetTypeId;
-
- 
-
-                List<Asset> assetDtoList = new();
-                assetDtoList.Add(assetDb);
-
-                List<AssetDTO> assetDTO = await AssetDTO.MapAssets(_db, assetDtoList);
-
-                await _db.SaveChangesAsync();
-                //AssetDTO newAssetDTO = new()
-                //{
-                //    Id = asset.Id,
-                //    Name = asset.Name,
-                //    CreatedAt = asset.CreatedAt,
-                //    UpdatedAt = asset.UpdatedAt,
-                //    AssetType =
-                //    {
-                //        Id = asset.AssetTypeId,
-                //        Name = assetPersistDTO.Name,
-                //    }
-                //};
-
-
-                return assetDTO;
+                return await _assetUpdateService.UpdateAsset(assetPersistDTO);
             }
         }
 
@@ -98,24 +63,7 @@ namespace CompanyWork.Controllers
         [HttpPost("search")] // + getAll
         public async Task<ActionResult<List<AssetDTO>>> SearchTerm(AssetLookup lookup)
         {
-            if (lookup == null)
-                return BadRequest("Search term cannot be empty.");
-
-            IQueryable<Asset> assetDb = _db.Asset; // all items
-
-
-            // Filters
-            if (!string.IsNullOrWhiteSpace(lookup.Like))
-                assetDb = assetDb.Where(a => a.Name.Contains(lookup.Like.ToLower()));
-
-            if (lookup.Id.HasValue)
-                assetDb = assetDb.Where(a => a.Id == lookup.Id.Value);
-
-
-            List<Asset> assetList = await assetDb.ToListAsync();
-            List<AssetDTO> assetDTO = await AssetDTO.MapAssets(_db, assetList);
-
-            return assetDTO;
+            return await _assetSearchService.SearchTerm(lookup);
         }
 
 
@@ -124,14 +72,7 @@ namespace CompanyWork.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<List<AssetDTO>>> ReadAsset(Guid id)
         {
-            var asset = await _db.Asset.FindAsync(id);
-
-            if (asset == null)
-                return BadRequest("Asset doesnt exist.");
-
-            List<AssetDTO> assetDTO = await MapAssets(_db, new List<Asset> { asset });
-
-            return assetDTO;
+            return await _assetGetByIdService.ReadAsset(id);
         }
 
 
@@ -139,16 +80,7 @@ namespace CompanyWork.Controllers
         [HttpDelete("{id}")]
         public async Task<IResult> DeleteAsset(Guid id)
         {
-            var asset = await _db.Asset.FindAsync(id);
-
-            if (asset == null)
-                return TypedResults.NotFound();
-
-            _db.Asset.Remove(asset);
-            await _db.SaveChangesAsync();
-
-            return TypedResults.NoContent();
-
+            return await _assetDeleteService.DeleteAsset(id);
         }
     }
 }
