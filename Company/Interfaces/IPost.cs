@@ -5,7 +5,7 @@ namespace CompanyWork.Interfaces
 {
     public interface IPost
     {
-        Task<List<AssetDTO>> GetAssetsAsync(AssetPersistDTO assetPersistDTO);
+        Task<List<AssetDTO>> PostAssetsAsync(AssetPersistDTO assetPersistDTO);
 
     }
 }

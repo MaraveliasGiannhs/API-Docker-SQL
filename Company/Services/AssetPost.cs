@@ -6,12 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CompanyWork.Services
 {
-    //primary constructor or not ??
+    
     public class AssetPost(MyDbContext db) : IPost 
     {
         private readonly MyDbContext _db = db;
 
-        public async Task<List<AssetDTO>> GetAssetsAsync(AssetDTO.AssetPersistDTO assetPersistDTO) //IPost
+        public async Task<List<AssetDTO>> PostAssetsAsync(AssetDTO.AssetPersistDTO assetPersistDTO) //IPost
         {
             Asset asset = new()  //add data to model
             {
