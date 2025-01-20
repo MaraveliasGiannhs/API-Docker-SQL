@@ -20,7 +20,7 @@ namespace CompanyWork.Models
 
             List<AssetDTO> assetListDTO = new();
 
-            List<AssetType> assetTypes = await _db.AssetType.ToListAsync();
+            List<AssetType> assetTypesDb = await _db.AssetType.ToListAsync();
 
             foreach (var asset in assets)
             {
@@ -32,7 +32,7 @@ namespace CompanyWork.Models
                     UpdatedAt = asset.UpdatedAt,
                 };
 
-                var filteredAssetTypes = assetTypes.Where(x => x.Id == asset.AssetTypeId);
+                var filteredAssetTypes = assetTypesDb.Where(x => x.Id == asset.AssetTypeId);
 
                 List<AssetTypeDTO> assetTypeDTOs = await AssetTypeDTO.MapAssetTypes(_db, filteredAssetTypes.ToList()); 
                 assetDTO.AssetType = assetTypeDTOs?.FirstOrDefault();
@@ -45,12 +45,7 @@ namespace CompanyWork.Models
 
         }
 
-        public class AssetPersistDTO
-        {
-            public Guid? Id { get; set; }
-            public string Name { get; set; }
-            public Guid AssetTypeId { get; set; }
-        }
+       
 
 
 

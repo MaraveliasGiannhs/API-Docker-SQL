@@ -15,7 +15,8 @@ namespace CompanyWork.Models
 
             foreach (var assetTypeItem in assetTypes)
             {
-                AssetTypeDTO assetTypeDTO = new AssetTypeDTO();
+                AssetTypeDTO assetTypeDTO = new();
+
                 assetTypeDTO.Id = assetTypeItem.Id;
                 assetTypeDTO.Name = assetTypeItem.Name;
 
