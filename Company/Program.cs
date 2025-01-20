@@ -8,7 +8,18 @@ var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
 // Add services to the container.
 
-builder.Services.AddDbContext<MyDbContext>(options => options.UseSqlServer(config.GetConnectionString("DefaultConnection"))); 
+
+//for DI
+builder.Services.AddScoped<AssetPost>();
+builder.Services.AddScoped<AssetUpdate>();
+builder.Services.AddScoped<AssetSearch>();
+builder.Services.AddScoped<AssetDelete>();
+builder.Services.AddScoped<AssetGetById>();
+
+//builder.Services.AddTransient<IPost, AssetPost>();
+
+
+builder.Services.AddDbContext<MyDbContext>(options => options.UseSqlServer(config.GetConnectionString("DefaultConnection")));
 builder.Services.AddMvcCore(); //maybe add .AddControllersAsServices();
 
 //add asset services here
@@ -33,9 +44,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-//DI
-builder.Services.AddScoped<IPost, AssetPost>();
-builder.Services.AddScoped<IUpdate, AssetUpdate>();
+ 
 
 
 
