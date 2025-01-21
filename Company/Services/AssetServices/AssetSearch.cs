@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CompanyWork.Services.AssetServices
 {
-    public class AssetSearch(MyDbContext db) : ISearch<AssetDTO, AssetLookup>
+    public class AssetSearch(MyDbContext db) //: ISearch<AssetDTO, Asset>, IPageData<Asset>
     {
         private readonly MyDbContext _db = db;
 
@@ -28,11 +28,37 @@ namespace CompanyWork.Services.AssetServices
             if (lookup.Id.HasValue)
                 assetDb = assetDb.Where(a => a.Id == lookup.Id.Value);
 
-
-            List<Asset> assetList = await assetDb.ToListAsync();
+            List<Asset> assetList = await PageData(assetDb, 1, 3);
+            //List<Asset> assetList = await assetDb.ToListAsync();
             List<AssetDTO> assetDTO = await AssetDTO.MapAssets(_db, assetList);
 
             return assetDTO;
+        }
+
+
+
+
+        public async Task<List<Asset>> PageData(IQueryable<Asset> data, int? selectedPage, int? pageSize)
+        {
+            List<Asset> listToPage = new();
+
+            //if (!pageNumber.HasValue)
+            //    return null;
+
+            if (!pageSize.HasValue)
+                return null;
+
+
+            //listToPage = await data
+            //    .OrderBy(d => d.Name) //check this again
+            //    .Skip(pageNumber.Value * pageSize.Value) //0, 5, 10, 15 ... 
+            //    .Take(pageSize.Value)
+            //    .ToListAsync();
+
+
+
+            return listToPage;
+
         }
     }
 }

@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using CompanyWork.Data;
-using CompanyWork.Interfaces;
 using CompanyWork.Services.AssetServices;
 using CompanyWork.Services.AssetTypeServices;
 
@@ -13,28 +12,25 @@ var config = builder.Configuration;
 //For DI
 //Asset
 builder.Services.AddScoped<AssetPostUpdate>();
-builder.Services.AddScoped<AssetSearch>();
+builder.Services.AddTransient<AssetSearch>();
 builder.Services.AddScoped<AssetDelete>();
 builder.Services.AddScoped<AssetGetById>();
+
+
 
 //AssetType
 builder.Services.AddScoped<AssetTypePostUpdate>();
 builder.Services.AddScoped<AssetTypeSearch>();
 builder.Services.AddScoped<AssetTypeDelete>();
 builder.Services.AddScoped<AssetTypeGetById>();
+//builder.Services.AddScoped<Test>();
 
 
-//builder.Services.AddTransient<IPost, AssetPost>();    //??
+
 
 
 builder.Services.AddDbContext<MyDbContext>(options => options.UseSqlServer(config.GetConnectionString("DefaultConnection")));
 builder.Services.AddMvcCore(); //maybe add .AddControllersAsServices();
-
-//add asset services here
-
-
-
-
 builder.Services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
 {
     builder.WithOrigins("http://localhost:4200")
@@ -44,18 +40,9 @@ builder.Services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
 }));
 
  
-
-
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-
- 
-
-
-
 var app = builder.Build();
 
 

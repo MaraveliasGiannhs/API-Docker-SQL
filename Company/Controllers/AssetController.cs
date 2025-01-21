@@ -68,9 +68,9 @@ namespace CompanyWork.Controllers
 
 
         [HttpDelete("{id}")]
-        public void DeleteAsset(Guid id)
+        public async Task DeleteAsset(Guid id)
         {
-            _assetDeleteService.DeleteAsync(id);
+            await _assetDeleteService.DeleteAsync(id);
         }
     }
 }

@@ -3,7 +3,7 @@
     public class AssetTypeLookup
     {
         public Guid? Id { get; set; }
-        public string Like { get; set; }
-
+        public string? Like { get; set; }
+        public int? SelectedPage { get; set; }
     }
 }

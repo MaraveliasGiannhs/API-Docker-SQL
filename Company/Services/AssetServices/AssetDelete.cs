@@ -7,16 +7,17 @@ namespace CompanyWork.Services.AssetServices
     public class AssetDelete(MyDbContext db) : IDelete
     {
         private readonly MyDbContext _db = db;
-
-        public async void DeleteAsync(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
             var asset = await _db.Asset.FindAsync(id);
 
-            if (asset == null)
+            if (asset == null) {
                 throw new ApplicationException();
+            }
 
             _db.Asset.Remove(asset);
             await _db.SaveChangesAsync();
+
             
         }
     }
