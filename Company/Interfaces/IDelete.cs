@@ -2,6 +2,6 @@
 {
     public interface IDelete
     {
-        void DeleteAsync(Guid id);
+        Task DeleteAsync(Guid id);
     }
 }
