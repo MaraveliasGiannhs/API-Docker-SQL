@@ -1,7 +1,9 @@
 ﻿using CompanyWork.Data;
+using CompanyWork.Interfaces;
 using System.Data.Entity;
-using System.Linq;
-using System.Runtime.CompilerServices;
+using Microsoft.EntityFrameworkCore;
+
+
 
 namespace CompanyWork.Utils
 {
