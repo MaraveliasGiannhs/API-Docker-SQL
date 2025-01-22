@@ -14,7 +14,7 @@ var config = builder.Configuration;
 builder.Services.AddScoped<AssetPostUpdate>();
 builder.Services.AddTransient<AssetSearch>();
 builder.Services.AddScoped<AssetDelete>();
-builder.Services.AddScoped<AssetGetById>();
+//builder.Services.AddScoped<AssetGetById>();
 
 
 
@@ -22,7 +22,7 @@ builder.Services.AddScoped<AssetGetById>();
 builder.Services.AddScoped<AssetTypePostUpdate>();
 builder.Services.AddScoped<AssetTypeSearch>();
 builder.Services.AddScoped<AssetTypeDelete>();
-builder.Services.AddScoped<AssetTypeGetById>();
+//builder.Services.AddScoped<AssetTypeGetById>();
 //builder.Services.AddScoped<Test>();
 
 
