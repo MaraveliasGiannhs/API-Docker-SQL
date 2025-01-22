@@ -25,21 +25,25 @@ namespace CompanyWork.Controllers
         private readonly AssetTypeDelete _assetTypeDelete;  
         private readonly IServiceProvider serviceProvider;
 
+
+
+
+
         public AssetTypeController(
             ILogger<AssetTypeController> logger,
             MyDbContext db,
             AssetTypePostUpdate assetTypePost,
             AssetTypeDelete assetTypeDelete,
-            AssetTypeSearch assetTypeSearch,
-            AssetTypeGetById assetTypeGetById)
+            AssetTypeSearch assetTypeSearch
+            )
         {
             _logger = logger;
             _db = db;
             _assetTypePost = assetTypePost;
             _assetTypeDelete = assetTypeDelete;
             _assetTypeSearch = assetTypeSearch;
-            //_assetTypeGetById = assetTypeGetById;
         }
+
 
 
 
@@ -48,16 +52,6 @@ namespace CompanyWork.Controllers
         {
             return await _assetTypePost.PostUpdateAsync(assetTypePersist);
         }
-
-
-
-
-
-        //[HttpGet("{id}")]
-        //public async Task<ActionResult<List<AssetTypeDTO>>> ReadAssetType(Guid id)
-        //{
-        //    return await _assetTypeGetById.GetByIdAsync(id);
-        //}
 
 
 
@@ -74,12 +68,21 @@ namespace CompanyWork.Controllers
 
             //AssetTypeSearch assetTypeSearch = serviceProvider.GetRequiredService<AssetTypeSearch>();
 
+             
+
+
+            // + checkNull method
             if (lookup.Id.HasValue)
-                _assetTypeSearch.Ids( lookup.Id.Value ); //pass lookup data via functions
+                _assetTypeSearch.Ids(lookup.Id.Value); //fluent pattern
 
             if (!string.IsNullOrEmpty(lookup.Like))
-                _assetTypeSearch.Names( lookup.Like );
+                _assetTypeSearch.Names(lookup.Like);
 
+            if (lookup.PageIndex.HasValue)
+                _assetTypeSearch.PageIndex(lookup.PageIndex.Value);
+
+            if (lookup.ItemsPerPage.HasValue)
+                _assetTypeSearch.PageSize(lookup.ItemsPerPage.Value);
 
             return await _assetTypeSearch.SearchAsync();
         }
@@ -87,11 +90,18 @@ namespace CompanyWork.Controllers
 
 
 
+        [HttpGet]
+        public async Task<int> GetElementSum()
+        {
+            return await _assetTypeSearch.Count();
+        }
+
+
+
         [HttpDelete("{id}")]
         public async Task DeleteAssetType(Guid id)
         {
             await _assetTypeDelete.DeleteAsync(id);
-
         }
     }
 }
