@@ -4,6 +4,7 @@
     {
         public Guid? Id { get; set; }
         public string? Like { get; set; }
-        public int? SelectedPage { get; set; }
+        public int? PageIndex { get; set; }
+        public int? ItemsPerPage { get; set; }
     }
 }
