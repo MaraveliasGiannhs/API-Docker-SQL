@@ -19,14 +19,15 @@ namespace CompanyWork.Controllers
         private readonly AssetPostUpdate _assetPostService;
         private readonly AssetSearch _assetSearchService;
         private readonly AssetDelete _assetDeleteService;
-        private readonly AssetGetById _assetGetByIdService;
+
+
+
 
         public AssetController(
             ILogger<AssetController> logger,
             MyDbContext db,
             AssetPostUpdate assetPostService,
             AssetSearch assetSearchService,
-            AssetGetById assetGetById,
             AssetDelete assetDelete
             )
         {
@@ -35,7 +36,6 @@ namespace CompanyWork.Controllers
             _assetPostService = assetPostService;
             _assetSearchService = assetSearchService;
             _assetDeleteService = assetDelete;
-            _assetGetByIdService = assetGetById;
         }
 
 
@@ -56,14 +56,6 @@ namespace CompanyWork.Controllers
             return await _assetSearchService.SearchTermAsync(lookup);
         }
 
-
-
-
-        [HttpGet("{id}")]
-        public async Task<ActionResult<List<AssetDTO>>> ReadAsset(Guid id)
-        {
-            return await _assetGetByIdService.GetByIdAsync(id);
-        }
 
 
 
