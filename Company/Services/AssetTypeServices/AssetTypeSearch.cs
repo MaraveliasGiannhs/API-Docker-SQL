@@ -3,6 +3,7 @@ using CompanyWork.Interfaces;
 using CompanyWork.Lookup;
 using CompanyWork.Models;
 using Microsoft.EntityFrameworkCore;
+using NPOI.OpenXmlFormats.Wordprocessing;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
@@ -17,24 +18,42 @@ namespace CompanyWork.Services.AssetTypeServices
     public class AssetTypeSearch(MyDbContext db) : ISearch<AssetTypeDTO, AssetType>
     {
         private readonly MyDbContext _db = db;
+
         private Guid? _id;
         private string? _name;
+        private int? _pageIndex;
+        private int? _itemsPerPage;
 
-        public AssetTypeSearch Ids(Guid id)
+        public AssetTypeSearch Ids(Guid id) 
         {
             _id = id;
+            return this;//for chaining
+        }
+
+        public AssetTypeSearch Names(string name) 
+        {
+            _name = name;
             return this;
         }
 
-        public AssetTypeSearch Names(string name)
+        public AssetTypeSearch PageIndex(int pageIndex)
         {
-            _name = name;
+            _pageIndex = pageIndex;
+            return this;
+        }
+
+        public AssetTypeSearch PageSize(int itemsPerPage)
+        {
+            _itemsPerPage = itemsPerPage;
             return this;
         }
  
         public async Task<List<AssetTypeDTO>> SearchAsync()
         {
+            Console.WriteLine("Index:" + _pageIndex);
+            Console.WriteLine("Items per page:" + _itemsPerPage);
 
+          
             //if (!_id.HasValue)
             //    return null;
             //if (_name == null)
@@ -48,11 +67,11 @@ namespace CompanyWork.Services.AssetTypeServices
             if (!string.IsNullOrWhiteSpace(_name))
                 assetTypeDb = assetTypeDb.Where(a => a.Name.Contains(_name.ToLower()));
 
-            if (this._id != null)
+            if (this._id.HasValue)//get by id
                 assetTypeDb = assetTypeDb.Where(a => a.Id == this._id);
 
 
-            List<AssetType> assetTypeList = await PageData(assetTypeDb, 1, 3);
+            List<AssetType> assetTypeList = await PageData(assetTypeDb, _pageIndex, _itemsPerPage);
             List<AssetTypeDTO> assetTypeDTOList = await AssetTypeDTO.MapAssetTypes(_db, assetTypeList);
 
 
@@ -68,32 +87,35 @@ namespace CompanyWork.Services.AssetTypeServices
             IQueryable<AssetType> assetTypeDb = _db.AssetType;
 
             //apply filters 
+            
 
             return await assetTypeDb.CountAsync();
         }
 
 
-        public async Task<List<AssetType>> PageData(IQueryable<AssetType> data, int? pageNumber, int? pageSize)
+        public async Task<List<AssetType>> PageData(IQueryable<AssetType> data, int? pageIndex, int? itemsPerPage)
         {
-            int allItems = 0;
+
+             
+
+            if (!itemsPerPage.HasValue)
+                itemsPerPage = 1;
 
 
-            if (!pageSize.HasValue)
-                pageSize = 1;
+            if (!pageIndex.HasValue)
+                pageIndex = 1;
 
-            if (!pageNumber.HasValue)
-                pageNumber = 1;
 
             List<AssetType> listToPage = new();
             listToPage = await data
-                .OrderBy(d => d.Name)
-                .Skip(pageNumber.Value * pageSize.Value) //0, 5, 10, 15 ... 
-                .Take(pageSize.Value)
+                //.OrderBy(d => d.Name)
+                .Skip((pageIndex.Value - 1) * itemsPerPage.Value) //0, 5, 10, 15 ... 
+                .Take(itemsPerPage.Value) //index
                 .ToListAsync();
 
-            foreach (var item in listToPage) //slightly faster 
-                allItems++;
-            Console.WriteLine("All items:" + allItems);
+            //foreach (var item in listToPage) //slightly faster than Count()
+            //    allItems++;
+            //Console.WriteLine("All items:" + allItems);
 
             //front
             //float pageNumber = allItems / pageSize.Value; //find total pages needed 
