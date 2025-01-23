@@ -6,6 +6,7 @@ using CompanyWork.Lookup;
 using System.Collections.Generic;
 using CompanyWork.PersistClasses;
 using CompanyWork.Services.AssetTypeServices;
+using NPOI.OpenXmlFormats.Spreadsheet;
 
 
 
@@ -68,12 +69,12 @@ namespace CompanyWork.Controllers
 
             //AssetTypeSearch assetTypeSearch = serviceProvider.GetRequiredService<AssetTypeSearch>();
 
-             
 
 
+            //fluent pattern
             // + checkNull method
             if (lookup.Id.HasValue)
-                _assetTypeSearch.Ids(lookup.Id.Value); //fluent pattern
+                _assetTypeSearch.Ids(lookup.Id.Value); 
 
             if (!string.IsNullOrEmpty(lookup.Like))
                 _assetTypeSearch.Names(lookup.Like);
@@ -84,6 +85,13 @@ namespace CompanyWork.Controllers
             if (lookup.ItemsPerPage.HasValue)
                 _assetTypeSearch.PageSize(lookup.ItemsPerPage.Value);
 
+            if (!string.IsNullOrEmpty(lookup.OrderItem))
+                _assetTypeSearch.OrderBy(lookup.OrderItem);
+
+            if (lookup.AscendingOrder.HasValue)
+                _assetTypeSearch.Ascending(lookup.AscendingOrder.Value);
+            
+            
             return await _assetTypeSearch.SearchAsync();
         }
 
