@@ -49,11 +49,11 @@ namespace CompanyWork.Services.AssetServices
                 return null;
 
 
-            //listToPage = await data
-            //    .OrderBy(d => d.Name) //check this again
-            //    .Skip(pageNumber.Value * pageSize.Value) //0, 5, 10, 15 ... 
-            //    .Take(pageSize.Value)
-            //    .ToListAsync();
+            listToPage = await data
+                .OrderBy(d => d.Name) //check this again
+                .Skip(selectedPage.Value * pageSize.Value) //0, 5, 10, 15 ... 
+                .Take(pageSize.Value)
+                .ToListAsync();
 
 
 
