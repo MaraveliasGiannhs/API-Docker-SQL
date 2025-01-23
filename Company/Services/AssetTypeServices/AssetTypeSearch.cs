@@ -1,10 +1,9 @@
-﻿using CompanyWork.Data;
+﻿using System.Linq.Expressions;
+using CompanyWork.Data;
 using CompanyWork.Interfaces;
-using CompanyWork.Lookup;
 using CompanyWork.Models;
 using Microsoft.EntityFrameworkCore;
-using NPOI.OpenXmlFormats.Wordprocessing;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+
 
 
 namespace CompanyWork.Services.AssetTypeServices
@@ -23,7 +22,8 @@ namespace CompanyWork.Services.AssetTypeServices
         private string? _name;
         private int? _pageIndex;
         private int? _itemsPerPage;
-
+        private string? _orderByItem;
+        private bool _ascending;
         public AssetTypeSearch Ids(Guid id) 
         {
             _id = id;
@@ -47,28 +47,41 @@ namespace CompanyWork.Services.AssetTypeServices
             _itemsPerPage = itemsPerPage;
             return this;
         }
- 
+        public AssetTypeSearch OrderBy(string? orderByItem)
+        {
+            _orderByItem = orderByItem;
+            return this;
+        }
+
+        public AssetTypeSearch Ascending(bool ascending)
+        {
+            _ascending = ascending;
+            return this;
+        }
+
         public async Task<List<AssetTypeDTO>> SearchAsync()
         {
-            Console.WriteLine("Index:" + _pageIndex);
-            Console.WriteLine("Items per page:" + _itemsPerPage);
-
-          
-            //if (!_id.HasValue)
-            //    return null;
-            //if (_name == null)
-            //    return null;
-
-
             IQueryable<AssetType> assetTypeDb = _db.AssetType;
 
 
-            // If not empty, add Filters
+            // Filters
             if (!string.IsNullOrWhiteSpace(_name))
                 assetTypeDb = assetTypeDb.Where(a => a.Name.Contains(_name.ToLower()));
 
             if (this._id.HasValue)//get by id
                 assetTypeDb = assetTypeDb.Where(a => a.Id == this._id);
+
+            if (!string.IsNullOrEmpty(_orderByItem))
+            {
+                Console.WriteLine("not NULL ORDER ITEM");
+                Console.WriteLine(_orderByItem); //ok
+                Console.WriteLine(_ascending); //ok
+
+                assetTypeDb = OrderByDynamically(assetTypeDb, _orderByItem, _ascending);
+            }
+            else
+                Console.WriteLine("NULL ORDER ITEM");
+
 
 
             List<AssetType> assetTypeList = await PageData(assetTypeDb, _pageIndex, _itemsPerPage);
@@ -81,30 +94,60 @@ namespace CompanyWork.Services.AssetTypeServices
             return assetTypeDTOList;
         }
 
+        //make it generic to use on other models
+        public IQueryable<AssetType> OrderByDynamically(IQueryable<AssetType> data ,string orderByItem, bool ascending)
+        {
+            var parameter = Expression.Parameter(typeof(AssetType), "a"); //input of lamda func representing AssetType model
+            var property = Expression.Property(parameter, orderByItem); //access AssetType's property with name of _orderByItem value
+
+            //parameter => property
+            //        a => a.field(a.id, a.name, etc...)
+
+            var lambda = Expression.Lambda<Func<AssetType, object>>(
+                Expression.Convert(property, typeof(object)),//body of lambda, return value (a.id) //convert expression to object for OrderBy
+                parameter); //input (a)
+            
+                       
+            
+            if (!ascending)
+                return data.OrderByDescending(lambda);
+            else
+                return data.OrderBy(lambda);
+            //check data value after ordering
+            //return data; wtf
+
+
+   
+        }
+
+
+
 
         public async Task<int> Count()
         {
             IQueryable<AssetType> assetTypeDb = _db.AssetType;
 
             //apply filters 
-            
+
+
+            //foreach (var item in listToPage) //slightly faster than linq Count
+            //    allItems++;
+            //Console.WriteLine("All items:" + allItems);
 
             return await assetTypeDb.CountAsync();
         }
 
 
+
+
         public async Task<List<AssetType>> PageData(IQueryable<AssetType> data, int? pageIndex, int? itemsPerPage)
         {
-
-             
 
             if (!itemsPerPage.HasValue)
                 itemsPerPage = 1;
 
-
             if (!pageIndex.HasValue)
                 pageIndex = 1;
-
 
             List<AssetType> listToPage = new();
             listToPage = await data
@@ -112,23 +155,6 @@ namespace CompanyWork.Services.AssetTypeServices
                 .Skip((pageIndex.Value - 1) * itemsPerPage.Value) //0, 5, 10, 15 ... 
                 .Take(itemsPerPage.Value) //index
                 .ToListAsync();
-
-            //foreach (var item in listToPage) //slightly faster than Count()
-            //    allItems++;
-            //Console.WriteLine("All items:" + allItems);
-
-            //front
-            //float pageNumber = allItems / pageSize.Value; //find total pages needed 
-            //Console.WriteLine("Pages needed (not rounded up):" + pageNumber);
-
-            //front
-            //if (pageNumber % 1 != 0) //round up a page to fit all items
-            //    pageNumber = (int)Math.Ceiling(pageNumber); // <-return total pages needed to front display 
-            //Console.WriteLine("Pages needed (rounded sum):" + pageNumber);
-
-
-
-
 
 
             return listToPage;
