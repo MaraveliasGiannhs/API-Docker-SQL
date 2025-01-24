@@ -47,6 +47,7 @@ namespace CompanyWork.Services.AssetTypeServices
             _itemsPerPage = itemsPerPage;
             return this;
         }
+
         public AssetTypeSearch OrderBy(string? orderByItem)
         {
             _orderByItem = orderByItem;
@@ -72,24 +73,13 @@ namespace CompanyWork.Services.AssetTypeServices
                 assetTypeDb = assetTypeDb.Where(a => a.Id == this._id);
 
             if (!string.IsNullOrEmpty(_orderByItem))
-            {
-                Console.WriteLine("not NULL ORDER ITEM");
-                Console.WriteLine(_orderByItem); //ok
-                Console.WriteLine(_ascending); //ok
-
                 assetTypeDb = OrderByDynamically(assetTypeDb, _orderByItem, _ascending);
-            }
             else
                 Console.WriteLine("NULL ORDER ITEM");
 
 
-
             List<AssetType> assetTypeList = await PageData(assetTypeDb, _pageIndex, _itemsPerPage);
             List<AssetTypeDTO> assetTypeDTOList = await AssetTypeDTO.MapAssetTypes(_db, assetTypeList);
-
-
-            //assetTypeDb = await AssetTypeDTO.MapAssetTypes(_db, assetTypeDb);
-            //var searchTerm = await assetTypeDb.ToListAsync(); 
 
             return assetTypeDTOList;
         }
@@ -116,8 +106,6 @@ namespace CompanyWork.Services.AssetTypeServices
             //check data value after ordering
             //return data; wtf
 
-
-   
         }
 
 
@@ -127,13 +115,9 @@ namespace CompanyWork.Services.AssetTypeServices
         {
             IQueryable<AssetType> assetTypeDb = _db.AssetType;
 
-            //apply filters 
-
-
             //foreach (var item in listToPage) //slightly faster than linq Count
             //    allItems++;
             //Console.WriteLine("All items:" + allItems);
-
             return await assetTypeDb.CountAsync();
         }
 
@@ -144,10 +128,10 @@ namespace CompanyWork.Services.AssetTypeServices
         {
 
             if (!itemsPerPage.HasValue)
-                itemsPerPage = 1;
+                throw new ApplicationException();
 
             if (!pageIndex.HasValue)
-                pageIndex = 1;
+                throw new ApplicationException();
 
             List<AssetType> listToPage = new();
             listToPage = await data
