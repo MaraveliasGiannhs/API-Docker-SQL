@@ -20,7 +20,7 @@ builder.Services.AddScoped<AssetDelete>();
 
 //AssetType
 builder.Services.AddScoped<AssetTypePostUpdate>();
-builder.Services.AddScoped<AssetTypeSearch>();
+builder.Services.AddTransient<AssetTypeSearch>();
 builder.Services.AddScoped<AssetTypeDelete>();
 //builder.Services.AddScoped<AssetTypeGetById>();
 //builder.Services.AddScoped<Test>();
