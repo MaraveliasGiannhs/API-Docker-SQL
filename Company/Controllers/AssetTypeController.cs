@@ -1,12 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using CompanyWork.Data;
 using CompanyWork.Models;
 using CompanyWork.Lookup;
-using System.Collections.Generic;
 using CompanyWork.PersistClasses;
 using CompanyWork.Services.AssetTypeServices;
-using NPOI.OpenXmlFormats.Spreadsheet;
 
 
 
@@ -24,7 +21,7 @@ namespace CompanyWork.Controllers
         private readonly AssetTypeSearch _assetTypeSearch;
         private readonly AssetTypePostUpdate _assetTypePost;
         private readonly AssetTypeDelete _assetTypeDelete;  
-        private readonly IServiceProvider serviceProvider;
+        //private readonly IServiceProvider serviceProvider;
 
 
 
