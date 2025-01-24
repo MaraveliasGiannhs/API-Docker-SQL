@@ -1,5 +1,4 @@
-﻿using static CompanyWork.Models.AssetDTO;
-using CompanyWork.Data;
+﻿using CompanyWork.Data;
 using Microsoft.AspNetCore.Mvc;
 using CompanyWork.Models;
 using CompanyWork.Lookup;
@@ -50,10 +49,35 @@ namespace CompanyWork.Controllers
 
 
 
-        [HttpPost("search")] // + getAll
+        [HttpPost("search")]
         public async Task<ActionResult<List<AssetDTO>>> SearchTerm(AssetLookup lookup)
         {
+            if (lookup.Id.HasValue)
+                _assetSearchService.Ids(lookup.Id.Value);
+
+            if (!string.IsNullOrEmpty(lookup.Like))
+                _assetSearchService.Names(lookup.Like);
+
+            if (lookup.PageIndex.HasValue)
+                _assetSearchService.PageIndex(lookup.PageIndex.Value);
+
+            if (lookup.ItemsPerPage.HasValue)
+                _assetSearchService.PageSize(lookup.ItemsPerPage.Value);
+
+            if (!string.IsNullOrEmpty(lookup.OrderItem))
+                _assetSearchService.OrderBy(lookup.OrderItem);
+
+            if (lookup.AscendingOrder.HasValue)
+                _assetSearchService.Ascending(lookup.AscendingOrder.Value);
+
             return await _assetSearchService.SearchTermAsync(lookup);
+        }
+
+
+        [HttpGet]
+        public async Task<int> GetElementSum()
+        {
+            return await _assetSearchService.Count();
         }
 
 
