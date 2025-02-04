@@ -9,7 +9,7 @@ var config = builder.Configuration;
 // Add services to the container.
 
 
-//For DI
+//Request Services for DI
 //Asset
 builder.Services.AddScoped<AssetPostUpdate>();
 builder.Services.AddTransient<AssetSearch>();
